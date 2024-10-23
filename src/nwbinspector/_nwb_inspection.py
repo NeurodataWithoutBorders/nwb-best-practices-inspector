@@ -126,7 +126,9 @@ def inspect_all(
     if progress_bar_options is None:
         progress_bar_options = dict(position=0, leave=False)
 
-    if in_path.is_dir():
+    if in_path.is_dir() and (in_path.match("*.nwb*")) and (in_path / ".zgroup").exists():
+        nwbfiles = [in_path]  # if it is a zarr directory
+    elif in_path.is_dir():
         nwbfiles = list(in_path.rglob("*.nwb*"))
 
         # Remove any macOS sidecar files
