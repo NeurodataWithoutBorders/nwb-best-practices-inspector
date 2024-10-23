@@ -268,74 +268,86 @@ class TestInspectorAPIAndCLIHDF5(TestInspectorOnBackend):
         ]
         self.assertCountEqual(first=test_results, second=true_results)
 
-        def test_inspect_all_parallel(self):
-            test_results = list(
-                inspect_all(path=Path(self.nwbfile_paths[0]).parent, select=[x.__name__ for x in self.checks], n_jobs=2)
+    def test_inspect_all_parallel(self):
+        test_results = list(
+            inspect_all(
+                path=Path(self.nwbfile_paths[0]).parent,
+                select=[x.__name__ for x in self.checks],
+                n_jobs=2,
+                skip_validate=self.skip_validate,
             )
-            true_results = [
-                InspectorMessage(
-                    message="data is not compressed. Consider enabling compression when writing a dataset.",
-                    importance=Importance.BEST_PRACTICE_SUGGESTION,
-                    severity=Severity.LOW,
-                    check_function_name="check_small_dataset_compression",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_1",
-                    location="/acquisition/test_time_series_1",
-                    file_path=self.nwbfile_paths[0],
+        )
+        true_results = [
+            InspectorMessage(
+                message="data is not compressed. Consider enabling compression when writing a dataset.",
+                importance=Importance.BEST_PRACTICE_SUGGESTION,
+                severity=Severity.LOW,
+                check_function_name="check_small_dataset_compression",
+                object_type="TimeSeries",
+                object_name="test_time_series_1",
+                location="/acquisition/test_time_series_1",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
+                    "and rate=0.5 instead of timestamps."
                 ),
-                InspectorMessage(
-                    message=(
-                        "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
-                        "and rate=0.5 instead of timestamps."
-                    ),
-                    importance=Importance.BEST_PRACTICE_VIOLATION,
-                    severity=Severity.LOW,
-                    check_function_name="check_regular_timestamps",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_2",
-                    location="/acquisition/test_time_series_2",
-                    file_path=self.nwbfile_paths[0],
+                importance=Importance.BEST_PRACTICE_VIOLATION,
+                severity=Severity.LOW,
+                check_function_name="check_regular_timestamps",
+                object_type="TimeSeries",
+                object_name="test_time_series_2",
+                location="/acquisition/test_time_series_2",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "Data may be in the wrong orientation. Time should be in the first dimension, and is usually "
+                    "the longest dimension. Here, another dimension is longer."
                 ),
-                InspectorMessage(
-                    message=(
-                        "Data may be in the wrong orientation. Time should be in the first dimension, and is usually "
-                        "the longest dimension. Here, another dimension is longer."
-                    ),
-                    importance=Importance.CRITICAL,
-                    severity=Severity.LOW,
-                    check_function_name="check_data_orientation",
-                    object_type="SpatialSeries",
-                    object_name="my_spatial_series",
-                    location="/processing/behavior/Position/my_spatial_series",
-                    file_path=self.nwbfile_paths[0],
+                importance=Importance.CRITICAL,
+                severity=Severity.LOW,
+                check_function_name="check_data_orientation",
+                object_type="SpatialSeries",
+                object_name="my_spatial_series",
+                location="/processing/behavior/Position/my_spatial_series",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=("The length of the first dimension of data (4) does not match the length of timestamps (3)."),
+                importance=Importance.CRITICAL,
+                severity=Severity.LOW,
+                check_function_name="check_timestamps_match_first_dimension",
+                object_type="TimeSeries",
+                object_name="test_time_series_3",
+                location="/acquisition/test_time_series_3",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
+                    "and rate=0.5 instead of timestamps."
                 ),
-                InspectorMessage(
-                    message=(
-                        "The length of the first dimension of data (4) does not match the length of timestamps (3)."
-                    ),
-                    importance=Importance.CRITICAL,
-                    severity=Severity.LOW,
-                    check_function_name="check_timestamps_match_first_dimension",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_3",
-                    location="/acquisition/test_time_series_3",
-                    file_path=self.nwbfile_paths[0],
-                ),
-                InspectorMessage(
-                    message=(
-                        "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
-                        "and rate=0.5 instead of timestamps."
-                    ),
-                    importance=Importance.BEST_PRACTICE_VIOLATION,
-                    severity=Severity.LOW,
-                    check_function_name="check_regular_timestamps",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_2",
-                    location="/acquisition/test_time_series_2",
-                    file_path=self.nwbfile_paths[1],
-                ),
-            ]
-            self.assertCountEqual(first=test_results, second=true_results)
+                importance=Importance.BEST_PRACTICE_VIOLATION,
+                severity=Severity.LOW,
+                check_function_name="check_regular_timestamps",
+                object_type="TimeSeries",
+                object_name="test_time_series_2",
+                location="/acquisition/test_time_series_2",
+                file_path=self.nwbfile_paths[1],
+            ),
+        ]
+        self.assertCountEqual(first=test_results, second=true_results)
+
+    def test_inspect_all_directory(self):
+        """Test that inspect_all will find the file when given a valid path (in the case of Zarr, this path may be a directory)."""
+        test_results = list(
+            inspect_all(
+                path=self.nwbfile_paths[0], select=[x.__name__ for x in self.checks], skip_validate=self.skip_validate
+            )
+        )
+        self.assertGreater(len(test_results), 0)
 
     def test_inspect_nwbfile(self):
         test_results = list(
