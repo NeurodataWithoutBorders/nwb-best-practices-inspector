@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from ._configuration import configure_checks
 from ._registration import Importance, InspectorMessage, available_checks
-from .tools._read_nwbfile import read_nwbfile, read_nwbfile_and_io
+from .tools._read_nwbfile import read_nwbfile
 from .utils import (
     OptionalListOfStrings,
     PathType,
@@ -271,10 +271,10 @@ def inspect_nwbfile(
     filterwarnings(action="ignore", message="Ignoring cached namespace .*")
 
     try:
-        in_memory_nwbfile, io = read_nwbfile_and_io(nwbfile_path=nwbfile_path)
+        in_memory_nwbfile = read_nwbfile(nwbfile_path=nwbfile_path)
 
         if not skip_validate:
-            validation_errors = pynwb.validate(io=io)
+            validation_errors, _ = pynwb.validate(paths=[nwbfile_path])
             for validation_error in validation_errors:
                 yield InspectorMessage(
                     message=validation_error.reason,
