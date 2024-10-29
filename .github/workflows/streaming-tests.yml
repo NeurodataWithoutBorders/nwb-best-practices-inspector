@@ -51,3 +51,29 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           file: ./cli_coverage.xml
+
+  build-and-test-no-dandi:
+    name: Testing using ${{ matrix.os }} with ${{ matrix.python-version }} without dandi dependencies
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --prune --unshallow --tags
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Install package
+        run: pip install .
+
+      - name: Run pytest with coverage
+        run: pytest -rsx
