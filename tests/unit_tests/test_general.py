@@ -13,23 +13,23 @@ def test_check_name_slashes_fail():
     # the latest version of HDMF/PyNWB forbids "/" in the object names when creating a new object
     # so we use in_construct_mode=True to simulate creating an object that was read from a file
     table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
-    table.__init__(name=f"test/ing", description="")
+    table.__init__(name="test/ing", description="")
     assert check_name_slashes(neurodata_object=table) == InspectorMessage(
         message="Object name contains slashes.",
         importance=Importance.CRITICAL,
         check_function_name="check_name_slashes",
         object_type="DynamicTable",
-        object_name=f"test/ing",
+        object_name="test/ing",
         location="/",
     )
-    
-    table = DynamicTable(name=f"test\\ing", description="")
+
+    table = DynamicTable(name="test\\ing", description="")
     assert check_name_slashes(neurodata_object=table) == InspectorMessage(
         message="Object name contains slashes.",
         importance=Importance.CRITICAL,
         check_function_name="check_name_slashes",
         object_type="DynamicTable",
-        object_name=f"test\\ing",
+        object_name="test\\ing",
         location="/",
     )
 
@@ -43,13 +43,13 @@ def test_check_name_slashes_fail():
     # the latest version of HDMF/PyNWB forbids ":" in the object names when creating a new object
     # so we use in_construct_mode=True to simulate creating an object that was read from a file
     table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
-    table.__init__(name=f"test:ing", description="")
+    table.__init__(name="test:ing", description="")
     assert check_name_colons(neurodata_object=table) == InspectorMessage(
         message="Object name contains colons.",
         importance=Importance.BEST_PRACTICE_SUGGESTION,
         check_function_name="check_name_colons",
         object_type="DynamicTable",
-        object_name=f"test:ing",
+        object_name="test:ing",
         location="/",
     )
 
