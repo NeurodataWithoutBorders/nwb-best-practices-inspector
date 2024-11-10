@@ -35,14 +35,14 @@ It is recommended to use :wikipedia:`CamelCase <Camel_case>` when naming instanc
 
 .. _best_practice_name_slashes:
 
-Do Not Use Slashes in Names
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Do Not Use Slashes or Colons in Names
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Slash characters ``'/'`` and ``'\'``  should not be used in the ``name`` of an object, because they can be confusing to systems that parse HDF5 files (which NWB uses as the primary backend, see the :nwb-overview:`NWB FAQ <faq_details/why_hdf5.html#why-hdf5>` for more details). The forward slash is used in `h5py` to specify a `Groups <https://schema-language.readthedocs.io/en/latest/description.html#groups>`_ hierarchy.
+Slash characters ``'/'`` and ``'\'`` and colons ``':'`` should not be used in the ``name`` of an object, because they can be confusing to systems that parse HDF5 files (which NWB uses as the primary backend, see the :nwb-overview:`NWB FAQ <faq_details/why_hdf5.html#why-hdf5>` for more details) and/or Zarr files (which NWB allows as a backend). The forward slash is used in `h5py` to specify a `Groups <https://schema-language.readthedocs.io/en/latest/description.html#groups>`_ hierarchy.
 
 For mathematical expressions, instead of including the special character in the name, please use an English equivalent instead. *E.g.*, instead of "Df/f" use "DfOverF".
 
-Check function: :py:meth:`~nwbinspector.checks._general.check_name_slashes`
+Check functions: :py:meth:`~nwbinspector.checks._general.check_name_slashes` and :py:meth:`~nwbinspector.checks._general.check_name_colons`
 
 
 
