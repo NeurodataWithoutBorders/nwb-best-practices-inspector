@@ -11,7 +11,7 @@ def test_check_name_slashes_pass():
 
 def test_check_name_slashes_fail():
     # the latest version of HDMF/PyNWB forbids "/" in the object names when creating a new object
-    # so we use in_construct_mode=True to simulate creating an object that was read from a file
+    # so we use in_construct_mode=True to simulate an object that was read from a file
     table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
     table.__init__(name="test/ing", description="")
     assert check_name_slashes(neurodata_object=table) == InspectorMessage(
@@ -41,7 +41,7 @@ def test_check_name_colons_pass():
 
 def test_check_name_slashes_fail():
     # the latest version of HDMF/PyNWB forbids ":" in the object names when creating a new object
-    # so we use in_construct_mode=True to simulate creating an object that was read from a file
+    # so we use in_construct_mode=True to simulate an object that was read from a file
     table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
     table.__init__(name="test:ing", description="")
     assert check_name_colons(neurodata_object=table) == InspectorMessage(
