@@ -10,17 +10,48 @@ def test_check_name_slashes_pass():
 
 
 def test_check_name_slashes_fail():
-    """HDMF/PyNWB forbid "/" in the object names. Might need an external file written in MATLAB to test that?"""
-    for x in ["\\"]:
-        table = DynamicTable(name=f"test{x}ing", description="")
-        assert check_name_slashes(neurodata_object=table) == InspectorMessage(
-            message="Object name contains slashes.",
-            importance=Importance.CRITICAL,
-            check_function_name="check_name_slashes",
-            object_type="DynamicTable",
-            object_name=f"test{x}ing",
-            location="/",
-        )
+    # the latest version of HDMF/PyNWB forbids "/" in the object names when creating a new object
+    # so we use in_construct_mode=True to simulate creating an object that was read from a file
+    table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
+    table.__init__(name=f"test/ing", description="")
+    assert check_name_slashes(neurodata_object=table) == InspectorMessage(
+        message="Object name contains slashes.",
+        importance=Importance.CRITICAL,
+        check_function_name="check_name_slashes",
+        object_type="DynamicTable",
+        object_name=f"test/ing",
+        location="/",
+    )
+    
+    table = DynamicTable(name=f"test\\ing", description="")
+    assert check_name_slashes(neurodata_object=table) == InspectorMessage(
+        message="Object name contains slashes.",
+        importance=Importance.CRITICAL,
+        check_function_name="check_name_slashes",
+        object_type="DynamicTable",
+        object_name=f"test\\ing",
+        location="/",
+    )
+
+
+def test_check_name_colons_pass():
+    table = DynamicTable(name="test_name", description="")
+    assert check_name_colons(neurodata_object=table) is None
+
+
+def test_check_name_slashes_fail():
+    # the latest version of HDMF/PyNWB forbids ":" in the object names when creating a new object
+    # so we use in_construct_mode=True to simulate creating an object that was read from a file
+    table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
+    table.__init__(name=f"test:ing", description="")
+    assert check_name_colons(neurodata_object=table) == InspectorMessage(
+        message="Object name contains colons.",
+        importance=Importance.BEST_PRACTICE_SUGGESTION,
+        check_function_name="check_name_colons",
+        object_type="DynamicTable",
+        object_name=f"test:ing",
+        location="/",
+    )
 
 
 def test_check_description_pass():
