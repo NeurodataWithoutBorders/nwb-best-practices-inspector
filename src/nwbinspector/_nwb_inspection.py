@@ -9,6 +9,7 @@ from typing import Iterable, Optional, Type, Union
 from warnings import filterwarnings, warn
 
 import pynwb
+from hdmf_zarr import ZarrIO
 from natsort import natsorted
 from tqdm import tqdm
 
@@ -126,7 +127,7 @@ def inspect_all(
     if progress_bar_options is None:
         progress_bar_options = dict(position=0, leave=False)
 
-    if in_path.is_dir() and (in_path.match("*.nwb*")) and (in_path / ".zgroup").exists():
+    if in_path.is_dir() and (in_path.match("*.nwb*")) and ZarrIO.can_read(in_path):
         nwbfiles = [in_path]  # if it is a zarr directory
     elif in_path.is_dir():
         nwbfiles = list(in_path.rglob("*.nwb*"))
