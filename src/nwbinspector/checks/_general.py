@@ -23,7 +23,7 @@ def check_description(neurodata_object: object) -> Optional[InspectorMessage]:
 
     Best Practice: :ref:`best_practice_placeholders`
     """
-    if not hasattr(neurodata_object, "description"):
+    if not hasattr(neurodata_object, "description") or type(neurodata_object.description) is not str:
         return None
     if neurodata_object.description is None or neurodata_object.description.strip(" ") == "":
         return InspectorMessage(message="Description is missing.")
