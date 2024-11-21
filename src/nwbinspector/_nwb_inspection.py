@@ -9,12 +9,13 @@ from typing import Iterable, Optional, Type, Union
 from warnings import filterwarnings, warn
 
 import pynwb
+from hdmf_zarr import ZarrIO
 from natsort import natsorted
 from tqdm import tqdm
 
 from ._configuration import configure_checks
 from ._registration import Importance, InspectorMessage, available_checks
-from .tools._read_nwbfile import read_nwbfile, read_nwbfile_and_io
+from .tools._read_nwbfile import read_nwbfile
 from .utils import (
     OptionalListOfStrings,
     PathType,
@@ -126,7 +127,9 @@ def inspect_all(
     if progress_bar_options is None:
         progress_bar_options = dict(position=0, leave=False)
 
-    if in_path.is_dir():
+    if in_path.is_dir() and (in_path.match("*.nwb*")) and ZarrIO.can_read(in_path):
+        nwbfiles = [in_path]  # if it is a zarr directory
+    elif in_path.is_dir():
         nwbfiles = list(in_path.rglob("*.nwb*"))
 
         # Remove any macOS sidecar files
@@ -271,10 +274,10 @@ def inspect_nwbfile(
     filterwarnings(action="ignore", message="Ignoring cached namespace .*")
 
     try:
-        in_memory_nwbfile, io = read_nwbfile_and_io(nwbfile_path=nwbfile_path)
+        in_memory_nwbfile = read_nwbfile(nwbfile_path=nwbfile_path)
 
         if not skip_validate:
-            validation_errors = pynwb.validate(io=io)
+            validation_errors, _ = pynwb.validate(paths=[nwbfile_path])
             for validation_error in validation_errors:
                 yield InspectorMessage(
                     message=validation_error.reason,
