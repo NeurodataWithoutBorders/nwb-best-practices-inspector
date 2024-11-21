@@ -1,5 +1,7 @@
 # Upcoming
 
+# v0.5.3
+
 ### Deprecation
 * Support for Python 3.8 has been removed. [#508](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/508)
 
