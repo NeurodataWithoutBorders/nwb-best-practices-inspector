@@ -54,7 +54,6 @@ def test_check_description_missing():
 
 def test_check_description_feature_extraction():
     import numpy as np
-
     from pynwb.ecephys import FeatureExtraction
     from pynwb.testing.mock.ecephys import mock_ElectrodeTable
 
@@ -68,10 +67,8 @@ def test_check_description_feature_extraction():
         name="PCA_features",
         electrodes=dynamic_table_region,
         description=["PC1", "PC2", "PC3", "PC4"],
-        times=[.033, .066, .099],
+        times=[0.033, 0.066, 0.099],
         features=np.random.rand(3, 5, 4),  # time, channel, feature
     )
 
     assert check_description(neurodata_object=feature_extraction) is None
-
-
