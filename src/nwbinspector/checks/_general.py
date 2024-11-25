@@ -27,7 +27,7 @@ def check_description(neurodata_object: object) -> Optional[InspectorMessage]:
         return None
 
     description = neurodata_object.description
-    if type(description) not in (str, None):
+    if description is not None and type(description) is not str:
         return None
     if description is None or description.strip(" ") == "":
         return InspectorMessage(message="Description is missing.")
