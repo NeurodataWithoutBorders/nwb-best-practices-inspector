@@ -1,5 +1,9 @@
 # Upcoming
 
+### Fixes
+* Fixed issue where the description check failed if the description was a list. [#535](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/535)
+
+
 # v0.6.0
 
 ### Deprecation
