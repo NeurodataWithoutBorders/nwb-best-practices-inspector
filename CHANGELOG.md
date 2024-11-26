@@ -1,5 +1,9 @@
 # Upcoming
 
+### Improvements
+* Added support for Numpy 2 and h5py 3.12. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
+
+
 # v0.6.0
 
 ### Deprecation
@@ -17,7 +21,6 @@
 * Cleaned old references to non-recent PyNWB and HDMF versions. Current policy is that latest NWB Inspector releases should only support compatibility with latest PyNWB and HDMF. [#510](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/510)
 * Swapped setup approach to the modern `pyproject.toml` standard. [#507](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/507)
 * Added complete annotation typing and integrated Mypy into pre-commit. [#520](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/520)
-* Added support for Numpy 2 and h5py 3.12. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
 
 ### Fixes
 * Fixed incorrect error message for OptogeneticStimulusSite. [#524](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/524)
