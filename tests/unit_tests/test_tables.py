@@ -3,8 +3,8 @@ import platform
 from unittest import TestCase
 
 import numpy as np
-from numpy.lib import NumpyVersion
 from hdmf.common import DynamicTable, DynamicTableRegion
+from numpy.lib import NumpyVersion
 from pynwb.file import Device, ElectrodeGroup, ElectrodeTable, TimeIntervals, Units
 
 from nwbinspector import Importance, InspectorMessage
@@ -189,7 +189,7 @@ class TestCheckBinaryColumns(TestCase):
         for x in [1, 0, 1, 0, 1]:
             self.table.add_row(test_col=x)
         # the default numpy int in Windows with NumPy < 2 is int32. otherwise it is int64.
-        if platform.system() == "Windows" and NumpyVersion(np.__version__) < '2.0.0':
+        if platform.system() == "Windows" and NumpyVersion(np.__version__) < "2.0.0":
             platform_saved_bytes = "15.00B"
         else:
             platform_saved_bytes = "35.00B"
