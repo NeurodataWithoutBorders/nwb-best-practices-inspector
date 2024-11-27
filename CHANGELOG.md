@@ -1,5 +1,14 @@
 # Upcoming
 
+### Improvements
+* Added support for Numpy 2 and h5py 3.12, and pinned PyNWB to <3.0 temporarily. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
+
+### Fixes
+* Fixed issue where the description check failed if the description was a list. [#535](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/535)
+
+
+# v0.6.0
+
 ### Deprecation
 * Support for Python 3.8 has been removed. [#508](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/508)
 
@@ -18,6 +27,7 @@
 
 ### Fixes
 * Fixed incorrect error message for OptogeneticStimulusSite. [#524](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/524)
+* Fixed detection of Zarr directories for inspection. [#531](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/531)
 
 
 # v0.5.2
