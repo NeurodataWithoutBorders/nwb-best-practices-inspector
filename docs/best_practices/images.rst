@@ -25,7 +25,8 @@ Use of IndexSeries
 ~~~~~~~~~~~~~~~~~~
 
 The use of an :ref:`nwb-schema:sec-IndexSeries` object to point to a :ref:`nwb-schema:sec-TimeSeries` will
-be deprecated in favor. The :ref:`nwb-schema:sec-IndexSeries` object should point to an
-:ref:`nwb-schema:sec-Images` container, which holds a collection of :ref:`nwb-schema:sec-Image` objects instead.
+be deprecated in a future release of the NWB schema. The :ref:`nwb-schema:sec-IndexSeries` object should
+point to an :ref:`nwb-schema:sec-Images` container, which holds a collection of :ref:`nwb-schema:sec-Image`
+objects instead.
 
 Check function: :py:meth:`~nwbinspector.checks._images.check_index_series_points_to_image`
