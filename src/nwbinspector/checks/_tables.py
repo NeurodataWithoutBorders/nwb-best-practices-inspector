@@ -155,7 +155,7 @@ def check_column_binary_capability(
                 ["hit", "miss"],
             ]
             if any([set(parsed_unique_values) == set(pair) for pair in pairs_to_check]):  # type: ignore
-                saved_bytes = (unique_values.dtype.itemsize - 1) * np.product(
+                saved_bytes = (unique_values.dtype.itemsize - 1) * np.prod(
                     get_data_shape(data=column.data, strict_no_data_load=True)
                 )
                 if unique_values.dtype == "float":
