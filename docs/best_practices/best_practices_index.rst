@@ -29,5 +29,6 @@ Authors: Oliver Ruebel, Andrew Tritt, Ryan Ly, Cody Baker and Ben Dichter
    ophys
    ogen
    image_series
+   images
    simulated_data
    extensions
