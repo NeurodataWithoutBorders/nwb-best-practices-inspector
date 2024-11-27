@@ -1,4 +1,4 @@
-name: Test against latest DANDI release - no network
+name: Run NWB Inspector tests against latest DANDI release - no network
 on: workflow_call
 
 env:
@@ -25,7 +25,7 @@ jobs:
           - '3.11'
 
     steps:
-    - name: Set up environment
+    - name: Checkout local branch of source repository
       uses: actions/checkout@v4
       with:
         # Fetch all commits so that versioneer will return something compatible
@@ -43,7 +43,9 @@ jobs:
         pip install "dandi[extras,test]"
 
     - name: Install this branch of NWB Inspector
-      run: pip install -e .
+      run: |
+        pip install -e .
+        pip install hdmf==3.14.3  # temporary: https://github.com/dandi/dandi-cli/issues/1494
 
     - name: Run all NWB Inspector tests
-      run: python -m pytest -s -v
+      run: pytest -rsx

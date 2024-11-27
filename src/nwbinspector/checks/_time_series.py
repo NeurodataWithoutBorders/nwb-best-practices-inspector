@@ -1,5 +1,7 @@
 """Check functions that can apply to any descendant of TimeSeries."""
 
+from typing import Optional
+
 import numpy as np
 from pynwb import TimeSeries
 from pynwb.image import ImageSeries, IndexSeries
@@ -11,7 +13,7 @@ from ..utils import get_data_shape, is_ascending_series, is_regular_series
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeSeries)
 def check_regular_timestamps(
     time_series: TimeSeries, time_tolerance_decimals: int = 9, gb_severity_threshold: float = 1.0
-):
+) -> Optional[InspectorMessage]:
     """If the TimeSeries uses timestamps, check if they are regular (i.e., they have a constant rate)."""
     if (
         time_series.timestamps is not None
@@ -33,14 +35,19 @@ def check_regular_timestamps(
             ),
         )
 
+    return None
+
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=TimeSeries)
-def check_data_orientation(time_series: TimeSeries):
+def check_data_orientation(time_series: TimeSeries) -> Optional[InspectorMessage]:
     """If the TimeSeries has data, check if the longest axis (almost always time) is also the zero-axis."""
     if time_series.data is None:
-        return
+        return None
 
     data_shape = get_data_shape(time_series.data)
+    if data_shape is None:
+        return None
+
     if any(np.array(data_shape[1:]) > data_shape[0]):
         return InspectorMessage(
             message=(
@@ -49,19 +56,29 @@ def check_data_orientation(time_series: TimeSeries):
             ),
         )
 
+    return None
+
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=TimeSeries)
-def check_timestamps_match_first_dimension(time_series: TimeSeries):
+def check_timestamps_match_first_dimension(time_series: TimeSeries) -> Optional[InspectorMessage]:
     """
     If the TimeSeries has timestamps, check if their length is the same as the zero-axis of data.
 
     Best Practice: :ref:`best_practice_data_orientation`
     """
     if time_series.data is None or time_series.timestamps is None:
-        return
+        return None
 
-    if getattr(time_series, "external_file", None) is not None and get_data_shape(time_series.data)[0] == 0:
-        return
+    data_shape = get_data_shape(time_series.data)
+    if data_shape is None:
+        return None
+
+    timestamps_shape = get_data_shape(time_series.timestamps)
+    if timestamps_shape is None:
+        return None
+
+    if getattr(time_series, "external_file", None) is not None and data_shape[0] == 0:
+        return None
 
     # A very specific edge case where this has been allowed, though much more preferable
     # to use a stack of Images rather than an ImageSeries
@@ -72,10 +89,8 @@ def check_timestamps_match_first_dimension(time_series: TimeSeries):
     ):
         for neurodata_object in time_series.get_ancestor("NWBFile").objects.values():
             if isinstance(neurodata_object, IndexSeries) and neurodata_object.indexed_timeseries == time_series:
-                return
+                return None
 
-    timestamps_shape = get_data_shape(time_series.timestamps)
-    data_shape = get_data_shape(time_series.data)
     if data_shape[0] != timestamps_shape[0]:
         return InspectorMessage(
             message=(
@@ -84,23 +99,29 @@ def check_timestamps_match_first_dimension(time_series: TimeSeries):
             )
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeSeries)
-def check_timestamps_ascending(time_series: TimeSeries, nelems=200):
+def check_timestamps_ascending(time_series: TimeSeries, nelems: Optional[int] = 200) -> Optional[InspectorMessage]:
     """Check that the values in the timestamps array are strictly increasing."""
     if time_series.timestamps is not None and not is_ascending_series(time_series.timestamps, nelems=nelems):
         return InspectorMessage(f"{time_series.name} timestamps are not ascending.")
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeSeries)
-def check_timestamps_without_nans(time_series: TimeSeries, nelems=200):
+def check_timestamps_without_nans(time_series: TimeSeries, nelems: Optional[int] = 200) -> Optional[InspectorMessage]:
     """Check if there are NaN values in the timestamps array."""
     if time_series.timestamps is not None and np.isnan(time_series.timestamps[:nelems]).any():
         return InspectorMessage(message=f"{time_series.name} timestamps contain NaN values.")
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=TimeSeries)
-def check_timestamp_of_the_first_sample_is_not_negative(time_series: TimeSeries):
+def check_timestamp_of_the_first_sample_is_not_negative(time_series: TimeSeries) -> Optional[InspectorMessage]:
     """
     Check that the timestamp of the first sample is not negative.
 
@@ -114,9 +135,11 @@ def check_timestamp_of_the_first_sample_is_not_negative(time_series: TimeSeries)
             " It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeSeries)
-def check_missing_unit(time_series: TimeSeries):
+def check_missing_unit(time_series: TimeSeries) -> Optional[InspectorMessage]:
     """
     Check if the TimeSeries.unit field is empty.
 
@@ -127,24 +150,34 @@ def check_missing_unit(time_series: TimeSeries):
             message="Missing text for attribute 'unit'. Please specify the scientific unit of the 'data'."
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeSeries)
-def check_resolution(time_series: TimeSeries):
+def check_resolution(time_series: TimeSeries) -> Optional[InspectorMessage]:
     """Check the resolution value of a TimeSeries for proper format (-1.0 or NaN for unknown)."""
     if time_series.resolution is None or time_series.resolution == -1.0:
-        return
+        return None
     if time_series.resolution <= 0:
         return InspectorMessage(
             message=f"'resolution' should use -1.0 or NaN for unknown instead of {time_series.resolution}."
         )
 
+    return None
+
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=TimeSeries)
-def check_rate_is_not_zero(time_series: TimeSeries):
+def check_rate_is_not_zero(time_series: TimeSeries) -> Optional[InspectorMessage]:
     if time_series.data is None:
-        return
+        return None
+
     data_shape = get_data_shape(time_series.data)
+    if data_shape is None:
+        return None
+
     if time_series.rate == 0.0 and data_shape[0] > 1:
         return InspectorMessage(
             f"{time_series.name} has a sampling rate value of 0.0Hz but the series has more than one frame."
         )
+
+    return None

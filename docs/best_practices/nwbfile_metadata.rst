@@ -30,10 +30,10 @@ value. Default values should generally not be used for this field. If the true d
 best guess. If the exact start time is unknown, then it is fine to simply set it to midnight on that date.
 
 
-Check functions: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_session_start_time_old_date`,
-:py:meth:`~nwbinspector.checks.nwbfile_metadata.check_session_start_time_future_date`,
-:py:meth:`~nwbinspector.checks.time_series.check_timestamp_of_the_first_sample_is_not_negative`
-:py:meth:`~nwbinspector.checks.tables.check_table_time_columns_are_not_negative`
+Check functions: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_session_start_time_old_date`,
+:py:meth:`~nwbinspector.checks._nwbfile_metadata.check_session_start_time_future_date`,
+:py:meth:`~nwbinspector.checks._time_series.check_timestamp_of_the_first_sample_is_not_negative`
+:py:meth:`~nwbinspector.checks._tables.check_table_time_columns_are_not_negative`
 
 
 
@@ -65,7 +65,7 @@ The name of any given processing module should be chosen from the following type
 modalities. It also helps distinguish components of a given experiment, such as decoupling the intermediate data from
 neural acquisition systems from behavioral ones.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_processing_module_name`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_processing_module_name`
 
 
 
@@ -103,7 +103,7 @@ Experimenter
 
 The ``experimenter`` field of an :ref:`nwb-schema:sec-NWBFile` should be specified as any of the accepted forms: 'LastName, Firstname', 'LastName, FirstName MiddleInitial.' or 'LastName, FirstName MiddleName'.
 
-Check functions: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_experimenter_exists` and :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_experimenter_form`
+Check functions: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_experimenter_exists` and :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_experimenter_form`
 
 
 
@@ -115,7 +115,7 @@ Experiment Description
 The ``experiment_description`` field of an :ref:`nwb-schema:sec-NWBFile` should be specified. This helps provide
 context for understanding the contents of the file.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_experiment_description`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_experiment_description`
 
 
 
@@ -127,7 +127,7 @@ Institution
 The ``institution`` field should be specified. This allows metadata collection programs, such as those on the
 :dandi-archive:`DANDI archive <>` to easily scan NWBFiles to deliver summary statistics.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_institution`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_institution`
 
 
 
@@ -159,7 +159,7 @@ of the form ``'doi: ###'`` or as an external link of the form ``'http://dx.doi.o
 This allows metadata collection programs, such as those on the :dandi-archive:`DANDI archive <>` to easily form direct
 hyperlinks to the publications.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_doi_publications`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_doi_publications`
 
 
 
@@ -171,7 +171,7 @@ Subject
 It is recommended to always include as many details about the experimental subject as possible. If the data is
 simulated, a simple ID of "simulated_subject" would be sufficient.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_subject_exists`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_subject_exists`
 
 
 
@@ -186,7 +186,7 @@ not intended for DANDI upload, if the :ref:`nwb-schema:sec-Subject` is specified
 
 In the special case of *in vitro* studies where the 'subject' of scientific interest was not a tissue sample obtained from a living subject but was instead a purified protein, this will be annotated by prepending the keyphrase "protein" to the subject ID; *e.g*, "proteinCaMPARI3". In the case where the *in vitro* experiment is performed on an extracted or cultured biological sample, the other subject attributes (such as age and sex) should be specified as their values at the time the sample was collected.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_subject_id_exists`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_subject_id_exists`
 
 
 
@@ -200,7 +200,7 @@ following four possibilities: "M" (male), "F" (female), "U" (unknown), or "O" (o
 
 C. elegans are an exception to this rule. For C. elegans, the sex should either be "XO" (male) or "XX" (hermaphrodite).
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_subject_sex`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_subject_sex`
 
 
 
@@ -211,7 +211,7 @@ Subject Species
 
 The ``species`` of a :ref:`nwb-schema:sec-Subject` should be set to the proper :wikipedia:`Latin binomial <Binomial_nomenclature>` or otherwise a full link to the Term IRI for the :ncbi:`NCBI Taxonomy <>`, which can be easily found at the :ontobee:`Ontobee  <>` database. *E.g.*, a rat would be "Rattus norvegicus" or "http://purl.obolibrary.org/obo/NCBITaxon_10116".
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_subject_species_form`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_subject_species_form`
 
 
 
@@ -235,7 +235,7 @@ If the precise age is unknown, an age range can be given by "[lower bound]/[uppe
 that the age is in between 10 and 20 days. If only the lower bound is known, then including only the slash after that lower bound can be used to indicate a
 missing bound. For instance, "P90Y/" would indicate that the age is 90 years or older.
 
-Check function: :py:meth:`~nwbinspector.checks.nwbfile_metadata.check_subject_age`
+Check function: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_subject_age`
 
 
 

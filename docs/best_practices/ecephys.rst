@@ -77,7 +77,7 @@ All spike times should be greater than zero. Being less than zero implies the sp
 should therefore be aligned to the ``timestamps_reference_time`` of the :ref:`nwb-schema:sec-NWBFile`) or the
 ``timestamps_reference_time`` itself is not set to the earliest recording time during the session.
 
-Check function: :py:meth:`~nwbinspector.checks.ecephys.check_negative_spike_times`
+Check function: :py:meth:`~nwbinspector.checks._ecephys.check_negative_spike_times`
 
 
 
@@ -88,4 +88,4 @@ Observation Intervals
 
 The ``obs_intervals`` field of the :ref:`nwb-schema:sec-units-src` table is used to indicate periods of time where the underlying electrical signal(s) were not observed. This can happen if the recording site moves away from the unit, or if the recording is stopped. Since the channel is not observed, it is not determinable whether a spike occurred during this time. Therefore, there should not be any identified spike times for units matched to those electrical signal(s) occurring outside of the defined ``obs_intervals``. If this variable is not set, it is assumed that all time is observed.
 
-Check function: :py:meth:`~nwbinspector.checks.ecephys.check_spike_times_not_in_unobserved_interval`
+Check function: :py:meth:`~nwbinspector.checks._ecephys.check_spike_times_not_in_unobserved_interval`

@@ -64,8 +64,8 @@ def test_trigger_check_compass_direction_unit():
     )
 
     assert (
-        check_compass_direction_unit(obj)[0].message == f"SpatialSeries objects inside a CompassDirection object "
-        f"should be angular and should have a unit of 'degrees' or 'radians', but 'SpatialSeries' has units 'meters'."
+        check_compass_direction_unit(obj)[0].message == "SpatialSeries objects inside a CompassDirection object "
+        "should be angular and should have a unit of 'degrees' or 'radians', but 'SpatialSeries' has units 'meters'."
     )
 
 

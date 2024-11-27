@@ -2,6 +2,7 @@
 
 import ntpath
 from pathlib import Path
+from typing import Iterable, Optional
 
 from pynwb.image import ImageSeries
 from pynwb.ophys import TwoPhotonSeries
@@ -11,15 +12,15 @@ from ..tools import get_nwbfile_path_from_internal_object
 
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=ImageSeries)
-def check_image_series_external_file_valid(image_series: ImageSeries):
+def check_image_series_external_file_valid(image_series: ImageSeries) -> Optional[Iterable[InspectorMessage]]:
     """
     Check if the external_file specified by an ImageSeries actually exists.
 
     Best Practice: :ref:`best_practice_use_external_mode`
     """
     if image_series.external_file is None:
-        return
-    nwbfile_path = Path(get_nwbfile_path_from_internal_object(obj=image_series))
+        return None
+    nwbfile_path = Path(get_nwbfile_path_from_internal_object(neurodata_object=image_series))
     for file_path in image_series.external_file:
         file_path = file_path.decode() if isinstance(file_path, bytes) else file_path
         if not Path(file_path).is_absolute() and not (nwbfile_path.parent / file_path).exists():
@@ -30,16 +31,18 @@ def check_image_series_external_file_valid(image_series: ImageSeries):
                 )
             )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=ImageSeries)
-def check_image_series_external_file_relative(image_series: ImageSeries):
+def check_image_series_external_file_relative(image_series: ImageSeries) -> Optional[Iterable[InspectorMessage]]:
     """
     Check if the external_file specified by an ImageSeries, if it exists, is relative.
 
     Best Practice: :ref:`best_practice_use_external_mode`
     """
     if image_series.external_file is None:
-        return
+        return None
     for file_path in image_series.external_file:
         file_path = file_path.decode() if isinstance(file_path, bytes) else file_path
         if ntpath.isabs(file_path):  # ntpath required for cross-platform detection
@@ -50,9 +53,11 @@ def check_image_series_external_file_relative(image_series: ImageSeries):
                 )
             )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=ImageSeries)
-def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: float = 20.0):
+def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: float = 20.0) -> Optional[InspectorMessage]:
     """
     Check if an ImageSeries stored is larger than gb_lower_bound and suggests external file.
 
@@ -61,7 +66,7 @@ def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: floa
     # False positive case; TwoPhotonSeries are a subclass of ImageSeries, but it is very common and perfectly fine
     # to write lots of data using one without an external file
     if isinstance(image_series, TwoPhotonSeries):
-        return
+        return None
 
     data = image_series.data
 
@@ -72,3 +77,5 @@ def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: floa
 
     if data_size_gb > gb_lower_bound:
         return InspectorMessage(message="ImageSeries is very large. Consider using external mode for better storage.")
+
+    return None

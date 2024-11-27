@@ -14,7 +14,7 @@ an external file. That is, the file should be packaged together with the nwb fil
 This can be accomplished by using  the ``external_file`` file option to store the path instead. This is preferred for
 videos because it allows the usage of video compression codecs that are lossy and highly optimized for such videos.
 
-Check function: :py:meth:`~nwbinspector.checks.image_series.check_image_series_data_size`
+Check function: :py:meth:`~nwbinspector.checks._image_series.check_image_series_data_size`
 
 
 Use internal dataset for videos of neurophysiological data
@@ -32,4 +32,4 @@ Use relative path for external mode
 
 When using ``external_file`` the paths passed in the ``external_file`` option should be relative to the location of the nwb file.
 
-Check function: :py:meth:`~nwbinspector.checks.image_series.check_image_series_external_file_relative`
+Check function: :py:meth:`~nwbinspector.checks._image_series.check_image_series_external_file_relative`

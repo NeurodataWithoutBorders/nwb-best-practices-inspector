@@ -9,7 +9,6 @@ from ._utils import (
     is_string_json_loadable,
     is_module_installed,
     get_package_version,
-    robust_s3_read,
     calculate_number_of_cpu,
     get_data_shape,
     PathType,  # TODO: deprecate in favor of explicit typing
@@ -28,7 +27,6 @@ __all__ = [
     "is_string_json_loadable",
     "is_module_installed",
     "get_package_version",
-    "robust_s3_read",
     "calculate_number_of_cpu",
     "get_data_shape",
 ]

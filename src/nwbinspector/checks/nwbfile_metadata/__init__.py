@@ -11,3 +11,8 @@ warnings.warn(message=message, category=DeprecationWarning, stacklevel=2)
 # Still keep imports functional with warning for soft deprecation cycle
 # TODO: remove after 9/15/2024
 from .._nwbfile_metadata import *
+
+# from .._nwbfile_metadata import check_subject_age
+# __all__ = [
+#     "check_subject_age",
+# ]

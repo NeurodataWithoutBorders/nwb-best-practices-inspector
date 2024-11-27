@@ -16,13 +16,13 @@ jobs:
     uses: neurodatawithoutborders/nwbinspector/.github/workflows/doc-link-checks.yml@dev
 
   test-dandi-latest:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_release.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-release.yml@dev
 
   test-dandi-dev:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-dev.yml@dev
 
   test-dandi-dev-live:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev_live_service.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-dev-live-services.yml@dev
 
   notify:
     runs-on: ubuntu-latest
@@ -36,6 +36,6 @@ jobs:
         username: ${{ secrets.MAIL_USERNAME }}
         password: ${{ secrets.MAIL_PASSWORD }}
         subject: NWB Inspector Daily Failure
-        to: cody.c.baker.phd@gmail.com,smprince@lbl.gov
+        to: smprince@lbl.gov, rly@lbl.gov
         from: NWB Inspector
         body: "The daily workflow for the NWB Inspector failed: please check status at https://github.com/NeurodataWithoutBorders/nwbinspector/actions/workflows/dailies.yml"

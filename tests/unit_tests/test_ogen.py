@@ -39,5 +39,5 @@ class TestCheckOptogeneticStimulusSiteHasOptogeneticSeries(TestCase):
     def test_check_triggered(self):
         assert (
             check_optogenetic_stimulus_site_has_optogenetic_series(self.ogen_site).message
-            == "OptogeneticStimulusSite is not referenced by any OptogeneticStimulusSite."
+            == "OptogeneticStimulusSite is not referenced by any OptogeneticSeries."
         )

@@ -3,12 +3,15 @@ from datetime import datetime
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
+from typing import Type, Union
 from unittest import TestCase
 
+import hdmf_zarr
 import numpy as np
+from hdmf.backends.io import HDMFIO
 from hdmf.common import DynamicTable
 from natsort import natsorted
-from pynwb import NWBHDF5IO, NWBFile, TimeSeries
+from pynwb import NWBFile, TimeSeries
 from pynwb.behavior import Position, SpatialSeries
 from pynwb.file import Subject, TimeIntervals
 
@@ -31,10 +34,33 @@ from nwbinspector.checks import (
     check_timestamps_match_first_dimension,
 )
 from nwbinspector.testing import make_minimal_nwbfile
+from nwbinspector.tools import BACKEND_IO_CLASSES
 from nwbinspector.utils import FilePathType
 
+IO_CLASSES_TO_BACKEND = {v: k for k, v in BACKEND_IO_CLASSES.items()}
+EXPECTED_REPORTS_FOLDER_PATH = Path(__file__).parent / "expected_reports"
 
-def add_big_dataset_no_compression(nwbfile: NWBFile):
+
+@register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
+def iterable_check_function(table: DynamicTable):
+    for col in table.columns:
+        yield InspectorMessage(message=f"Column: {col.name}")
+
+
+def add_big_dataset_no_compression(nwbfile: NWBFile, zarr: bool = False) -> None:
+    # Zarr automatically compresses by default
+    # So to get a test case that is not compressed, forcibly disable the compressor
+    if zarr:
+        time_series = TimeSeries(
+            name="test_time_series_1",
+            data=hdmf_zarr.ZarrDataIO(np.zeros(shape=int(1.1e9 / np.dtype("float").itemsize)), compressor=False),
+            rate=1.0,
+            unit="",
+        )
+        nwbfile.add_acquisition(time_series)
+
+        return
+
     time_series = TimeSeries(
         name="test_time_series_1", data=np.zeros(shape=int(1.1e9 / np.dtype("float").itemsize)), rate=1.0, unit=""
     )
@@ -85,46 +111,61 @@ def add_simple_table(nwbfile: NWBFile):
     nwbfile.add_acquisition(time_intervals)
 
 
-class TestInspector(TestCase):
-    """A common helper class for testing the NWBInspector."""
+class TestInspectorOnBackend(TestCase):
+    """A common helper class for testing the NWBInspector on files of a specific backend (HDF5 or Zarr)."""
+
+    BackendIOClass: Type[HDMFIO]
+    skip_validate = False  # TODO: can be removed once NWBZarrIO validation issues are resolved
 
     @staticmethod
-    def assertFileExists(path: FilePathType):
+    def assertFileExists(path: Union[str, Path]):
         path = Path(path)
         assert path.exists()
 
     def assertLogFileContentsEqual(
-        self, test_file_path: FilePathType, true_file_path: FilePathType, skip_first_newlines: bool = False
+        self,
+        test_file_path: FilePathType,
+        true_file_path: FilePathType,
+        skip_first_newlines: bool = True,
+        skip_last_newlines: bool = True,
     ):
-        skip_first_n_lines = 0
         with open(file=test_file_path, mode="r") as test_file:
-            test_file_lines = test_file.readlines()
+            test_file_lines = [x.rstrip("\n") for x in test_file.readlines()]
         with open(file=true_file_path, mode="r") as true_file:
-            true_file_lines = true_file.readlines()
+            true_file_lines = [x.rstrip("\n") for x in true_file.readlines()]
 
+        skip_first_n_lines = 0
         if skip_first_newlines:
             for line_number, test_line in enumerate(test_file_lines):
-                if test_line != "\n":
+                if len(test_line) > 8:  # Can sometimes be a CLI specific byte such as '\x1b[0m\x1b[0m'
                     skip_first_n_lines = line_number
                     break
-        else:
-            skip_first_n_lines = 0
+
+        skip_last_n_lines = 0
+        if skip_last_newlines:
+            for line_number, test_line in enumerate(test_file_lines[::-1]):
+                if len(test_line) > 4:  # Can sometimes be a CLI specific byte such as '\x1b[0m'
+                    skip_last_n_lines = line_number - 1  # Adjust for negative slicing
+                    break
 
         for line_number, test_line in enumerate(test_file_lines):
             if "Timestamp: " in test_line:
                 # Transform the test file header to match ground true example
-                test_file_lines[line_number] = "Timestamp: 2022-04-01 13:32:13.756390-04:00\n"
-                test_file_lines[line_number + 1] = "Platform: Windows-10-10.0.19043-SP0\n"
-                test_file_lines[line_number + 2] = "NWBInspector version: 0.3.6\n"
+                test_file_lines[line_number] = "Timestamp: 2022-04-01 13:32:13.756390-04:00"
+                test_file_lines[line_number + 1] = "Platform: Windows-10-10.0.19043-SP0"
+                test_file_lines[line_number + 2] = "NWBInspector version: 0.3.6"
             if ".nwb" in test_line:
                 # Transform temporary testing path and formatted to hardcoded fake path
                 str_loc = test_line.find(".nwb")
                 correction_str = test_line.replace(test_line[5 : str_loc - 8], "./")  # noqa: E203 (black)
                 test_file_lines[line_number] = correction_str
-        self.assertEqual(first=test_file_lines[skip_first_n_lines:-1], second=true_file_lines)
+        self.assertEqual(first=test_file_lines[skip_first_n_lines : -(1 + skip_last_n_lines)], second=true_file_lines)
 
 
-class TestInspectorAPI(TestInspector):
+class TestInspectorAPIAndCLIHDF5(TestInspectorOnBackend):
+    BackendIOClass = BACKEND_IO_CLASSES["hdf5"]
+    skip_validate = False
+    true_report_file_path = EXPECTED_REPORTS_FOLDER_PATH / "true_nwbinspector_default_report_hdf5.txt"
     maxDiff = None
 
     @classmethod
@@ -140,7 +181,7 @@ class TestInspectorAPI(TestInspector):
         nwbfiles = list()
         for j in range(num_nwbfiles):
             nwbfiles.append(make_minimal_nwbfile())
-        add_big_dataset_no_compression(nwbfiles[0])
+        add_big_dataset_no_compression(nwbfiles[0], zarr=cls.BackendIOClass is BACKEND_IO_CLASSES["zarr"])
         add_regular_timestamps(nwbfiles[0])
         add_flipped_data_orientation_to_processing(nwbfiles[0])
         add_non_matching_timestamps_dimension(nwbfiles[0])
@@ -149,18 +190,21 @@ class TestInspectorAPI(TestInspector):
         # Third file to be left without violations
         add_non_matching_timestamps_dimension(nwbfiles[3])
 
-        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb") for j in range(num_nwbfiles)]
-        cls.nwbfile_paths[3] = str(cls.tempdir / f"._testing3.nwb")
+        suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
+        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)]
+        cls.nwbfile_paths[3] = str(cls.tempdir / "._testing3.nwb")
         for nwbfile_path, nwbfile in zip(cls.nwbfile_paths, nwbfiles):
-            with NWBHDF5IO(path=nwbfile_path, mode="w") as io:
+            with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
                 io.write(nwbfile)
 
     @classmethod
     def tearDownClass(cls):
-        rmtree(cls.tempdir)
+        rmtree(cls.tempdir, ignore_errors=True)
 
     def test_inspect_all(self):
-        test_results = list(inspect_all(path=self.tempdir, select=[x.__name__ for x in self.checks]))
+        test_results = list(
+            inspect_all(path=self.tempdir, select=[x.__name__ for x in self.checks], skip_validate=self.skip_validate)
+        )
         true_results = [
             InspectorMessage(
                 message="data is not compressed. Consider enabling compression when writing a dataset.",
@@ -224,77 +268,91 @@ class TestInspectorAPI(TestInspector):
         ]
         self.assertCountEqual(first=test_results, second=true_results)
 
-        def test_inspect_all_parallel(self):
-            test_results = list(
-                inspect_all(path=Path(self.nwbfile_paths[0]).parent, select=[x.__name__ for x in self.checks], n_jobs=2)
+    def test_inspect_all_parallel(self):
+        test_results = list(
+            inspect_all(
+                path=Path(self.nwbfile_paths[0]).parent,
+                select=[x.__name__ for x in self.checks],
+                n_jobs=2,
+                skip_validate=self.skip_validate,
             )
-            true_results = [
-                InspectorMessage(
-                    message="data is not compressed. Consider enabling compression when writing a dataset.",
-                    importance=Importance.BEST_PRACTICE_SUGGESTION,
-                    severity=Severity.LOW,
-                    check_function_name="check_small_dataset_compression",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_1",
-                    location="/acquisition/test_time_series_1",
-                    file_path=self.nwbfile_paths[0],
+        )
+        true_results = [
+            InspectorMessage(
+                message="data is not compressed. Consider enabling compression when writing a dataset.",
+                importance=Importance.BEST_PRACTICE_SUGGESTION,
+                severity=Severity.LOW,
+                check_function_name="check_small_dataset_compression",
+                object_type="TimeSeries",
+                object_name="test_time_series_1",
+                location="/acquisition/test_time_series_1",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
+                    "and rate=0.5 instead of timestamps."
                 ),
-                InspectorMessage(
-                    message=(
-                        "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
-                        "and rate=0.5 instead of timestamps."
-                    ),
-                    importance=Importance.BEST_PRACTICE_VIOLATION,
-                    severity=Severity.LOW,
-                    check_function_name="check_regular_timestamps",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_2",
-                    location="/acquisition/test_time_series_2",
-                    file_path=self.nwbfile_paths[0],
+                importance=Importance.BEST_PRACTICE_VIOLATION,
+                severity=Severity.LOW,
+                check_function_name="check_regular_timestamps",
+                object_type="TimeSeries",
+                object_name="test_time_series_2",
+                location="/acquisition/test_time_series_2",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "Data may be in the wrong orientation. Time should be in the first dimension, and is usually "
+                    "the longest dimension. Here, another dimension is longer."
                 ),
-                InspectorMessage(
-                    message=(
-                        "Data may be in the wrong orientation. Time should be in the first dimension, and is usually "
-                        "the longest dimension. Here, another dimension is longer."
-                    ),
-                    importance=Importance.CRITICAL,
-                    severity=Severity.LOW,
-                    check_function_name="check_data_orientation",
-                    object_type="SpatialSeries",
-                    object_name="my_spatial_series",
-                    location="/processing/behavior/Position/my_spatial_series",
-                    file_path=self.nwbfile_paths[0],
+                importance=Importance.CRITICAL,
+                severity=Severity.LOW,
+                check_function_name="check_data_orientation",
+                object_type="SpatialSeries",
+                object_name="my_spatial_series",
+                location="/processing/behavior/Position/my_spatial_series",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=("The length of the first dimension of data (4) does not match the length of timestamps (3)."),
+                importance=Importance.CRITICAL,
+                severity=Severity.LOW,
+                check_function_name="check_timestamps_match_first_dimension",
+                object_type="TimeSeries",
+                object_name="test_time_series_3",
+                location="/acquisition/test_time_series_3",
+                file_path=self.nwbfile_paths[0],
+            ),
+            InspectorMessage(
+                message=(
+                    "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
+                    "and rate=0.5 instead of timestamps."
                 ),
-                InspectorMessage(
-                    message=(
-                        "The length of the first dimension of data (4) does not match the length of timestamps (3)."
-                    ),
-                    importance=Importance.CRITICAL,
-                    severity=Severity.LOW,
-                    check_function_name="check_timestamps_match_first_dimension",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_3",
-                    location="/acquisition/test_time_series_3",
-                    file_path=self.nwbfile_paths[0],
-                ),
-                InspectorMessage(
-                    message=(
-                        "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 "
-                        "and rate=0.5 instead of timestamps."
-                    ),
-                    importance=Importance.BEST_PRACTICE_VIOLATION,
-                    severity=Severity.LOW,
-                    check_function_name="check_regular_timestamps",
-                    object_type="TimeSeries",
-                    object_name="test_time_series_2",
-                    location="/acquisition/test_time_series_2",
-                    file_path=self.nwbfile_paths[1],
-                ),
-            ]
-            self.assertCountEqual(first=test_results, second=true_results)
+                importance=Importance.BEST_PRACTICE_VIOLATION,
+                severity=Severity.LOW,
+                check_function_name="check_regular_timestamps",
+                object_type="TimeSeries",
+                object_name="test_time_series_2",
+                location="/acquisition/test_time_series_2",
+                file_path=self.nwbfile_paths[1],
+            ),
+        ]
+        self.assertCountEqual(first=test_results, second=true_results)
+
+    def test_inspect_all_directory(self):
+        """Test that inspect_all will find the file when given a valid path (in the case of Zarr, this path may be a directory)."""
+        test_results = list(
+            inspect_all(
+                path=self.nwbfile_paths[0], select=[x.__name__ for x in self.checks], skip_validate=self.skip_validate
+            )
+        )
+        self.assertGreater(len(test_results), 0)
 
     def test_inspect_nwbfile(self):
-        test_results = list(inspect_nwbfile(nwbfile_path=self.nwbfile_paths[0], checks=self.checks))
+        test_results = list(
+            inspect_nwbfile(nwbfile_path=self.nwbfile_paths[0], checks=self.checks, skip_validate=self.skip_validate)
+        )
         true_results = [
             InspectorMessage(
                 message="data is not compressed. Consider enabling compression when writing a dataset.",
@@ -346,7 +404,10 @@ class TestInspectorAPI(TestInspector):
     def test_inspect_nwbfile_importance_threshold_as_importance(self):
         test_results = list(
             inspect_nwbfile(
-                nwbfile_path=self.nwbfile_paths[0], checks=self.checks, importance_threshold=Importance.CRITICAL
+                nwbfile_path=self.nwbfile_paths[0],
+                checks=self.checks,
+                importance_threshold=Importance.CRITICAL,
+                skip_validate=self.skip_validate,
             )
         )
         true_results = [
@@ -376,7 +437,12 @@ class TestInspectorAPI(TestInspector):
 
     def test_inspect_nwbfile_importance_threshold_as_string(self):
         test_results = list(
-            inspect_nwbfile(nwbfile_path=self.nwbfile_paths[0], checks=self.checks, importance_threshold="CRITICAL")
+            inspect_nwbfile(
+                nwbfile_path=self.nwbfile_paths[0],
+                checks=self.checks,
+                importance_threshold="CRITICAL",
+                skip_validate=self.skip_validate,
+            )
         )
         true_results = [
             InspectorMessage(
@@ -408,12 +474,13 @@ class TestInspectorAPI(TestInspector):
         os.system(
             f"nwbinspector {str(self.tempdir)} --overwrite --select check_timestamps_match_first_dimension,"
             "check_data_orientation,check_regular_timestamps,check_small_dataset_compression "
-            "--modules random,math,datetime"
+            "--modules random,math,datetime "
+            "--skip-validate "
             f"> {console_output_file}"
         )
         self.assertLogFileContentsEqual(
             test_file_path=console_output_file,
-            true_file_path=Path(__file__).parent / "true_nwbinspector_default_report.txt",
+            true_file_path=self.true_report_file_path,
             skip_first_newlines=True,
         )
 
@@ -421,12 +488,13 @@ class TestInspectorAPI(TestInspector):
         console_output_file = self.tempdir / "test_console_output_2.txt"
         os.system(
             f"nwbinspector {str(self.tempdir)} --n-jobs 2 --overwrite --select check_timestamps_match_first_dimension,"
-            "check_data_orientation,check_regular_timestamps,check_small_dataset_compression"
+            "check_data_orientation,check_regular_timestamps,check_small_dataset_compression "
+            "--skip-validate "
             f"> {console_output_file}"
         )
         self.assertLogFileContentsEqual(
             test_file_path=console_output_file,
-            true_file_path=Path(__file__).parent / "true_nwbinspector_default_report.txt",
+            true_file_path=self.true_report_file_path,
             skip_first_newlines=True,
         )
 
@@ -434,7 +502,8 @@ class TestInspectorAPI(TestInspector):
         console_output_file = self.tempdir / "test_console_output_3.txt"
         os.system(
             f"nwbinspector {str(self.nwbfile_paths[0])} "
-            f"--report-file-path {self.tempdir / 'test_nwbinspector_report_1.txt'}"
+            f"--report-file-path {self.tempdir / 'test_nwbinspector_report_1.txt'} "
+            "--skip-validate "
             f"> {console_output_file}"
         )
         self.assertFileExists(path=self.tempdir / "test_nwbinspector_report_1.txt")
@@ -444,14 +513,15 @@ class TestInspectorAPI(TestInspector):
         os.system(
             f"nwbinspector {str(self.nwbfile_paths[0])} "
             f"--report-file-path {self.tempdir / 'test_nwbinspector_report_2.txt'} "
-            "--levels importance,check_function_name,file_path"
+            "--levels importance,check_function_name,file_path "
+            "--skip-validate "
             f"> {console_output_file}"
         )
         self.assertFileExists(path=self.tempdir / "test_nwbinspector_report_2.txt")
 
     def test_command_line_runs_saves_json(self):
         json_fpath = self.tempdir / "nwbinspector_results.json"
-        os.system(f"nwbinspector {str(self.nwbfile_paths[0])} --json-file-path {json_fpath}")
+        os.system(f"nwbinspector {str(self.nwbfile_paths[0])} --json-file-path {json_fpath} " f"--skip-validate ")
         self.assertFileExists(path=json_fpath)
 
     def test_command_line_on_directory_matches_file(self):
@@ -459,22 +529,22 @@ class TestInspectorAPI(TestInspector):
         os.system(
             f"nwbinspector {str(self.tempdir)} --overwrite --select check_timestamps_match_first_dimension,"
             "check_data_orientation,check_regular_timestamps,check_small_dataset_compression"
-            f" --report-file-path {self.tempdir / 'test_nwbinspector_report_3.txt'}"
+            f" --report-file-path {self.tempdir / 'test_nwbinspector_report_3.txt'} "
+            "--skip-validate "
             f"> {console_output_file}"
         )
         self.assertLogFileContentsEqual(
             test_file_path=self.tempdir / "test_nwbinspector_report_3.txt",
-            true_file_path=Path(__file__).parent / "true_nwbinspector_default_report.txt",
+            true_file_path=self.true_report_file_path,
             skip_first_newlines=True,
         )
 
     def test_iterable_check_function(self):
-        @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
-        def iterable_check_function(table: DynamicTable):
-            for col in table.columns:
-                yield InspectorMessage(message=f"Column: {col.name}")
-
-        test_results = list(inspect_nwbfile(nwbfile_path=self.nwbfile_paths[0], select=["iterable_check_function"]))
+        test_results = list(
+            inspect_nwbfile(
+                nwbfile_path=self.nwbfile_paths[0], select=["iterable_check_function"], skip_validate=self.skip_validate
+            )
+        )
         true_results = [
             InspectorMessage(
                 message="Column: start_time",
@@ -496,7 +566,9 @@ class TestInspectorAPI(TestInspector):
         self.assertCountEqual(first=test_results, second=true_results)
 
     def test_inspect_nwbfile_manual_iteration(self):
-        generator = inspect_nwbfile(nwbfile_path=self.nwbfile_paths[0], checks=self.checks)
+        generator = inspect_nwbfile(
+            nwbfile_path=self.nwbfile_paths[0], checks=self.checks, skip_validate=self.skip_validate
+        )
         message = next(generator)
         true_result = InspectorMessage(
             message="data is not compressed. Consider enabling compression when writing a dataset.",
@@ -511,7 +583,9 @@ class TestInspectorAPI(TestInspector):
         self.assertEqual(message, true_result)
 
     def test_inspect_nwbfile_manual_iteration_stop(self):
-        generator = inspect_nwbfile(nwbfile_path=self.nwbfile_paths[2], checks=self.checks)
+        generator = inspect_nwbfile(
+            nwbfile_path=self.nwbfile_paths[2], checks=self.checks, skip_validate=self.skip_validate
+        )
         with self.assertRaises(expected_exception=StopIteration):
             next(generator)
 
@@ -522,6 +596,7 @@ class TestInspectorAPI(TestInspector):
                 nwbfile_path=self.nwbfile_paths[0],
                 checks=config_checks,
                 config=load_config(filepath_or_keyword="dandi"),
+                skip_validate=self.skip_validate,
             )
         )
         true_results = [
@@ -581,7 +656,16 @@ class TestInspectorAPI(TestInspector):
         self.assertCountEqual(first=test_results, second=true_results)
 
 
-class TestDANDIConfig(TestInspector):
+class TestInspectorAPIAndCLIZarr(TestInspectorAPIAndCLIHDF5):
+    BackendIOClass = BACKEND_IO_CLASSES["zarr"]
+    true_report_file_path = EXPECTED_REPORTS_FOLDER_PATH / "true_nwbinspector_default_report_zarr.txt"
+    skip_validate = True
+
+
+class TestDANDIConfigHDF5(TestInspectorOnBackend):
+    BackendIOClass = BACKEND_IO_CLASSES["hdf5"]
+    true_report_file_path = EXPECTED_REPORTS_FOLDER_PATH / "true_nwbinspector_report_with_dandi_config_hdf5.txt"
+    skip_validate = False
     maxDiff = None
 
     @classmethod
@@ -599,14 +683,15 @@ class TestDANDIConfig(TestInspector):
         add_simple_table(nwbfiles[0])
         add_flipped_data_orientation_to_acquisition(nwbfiles[1])
 
-        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb") for j in range(num_nwbfiles)]
+        suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
+        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)]
         for nwbfile_path, nwbfile in zip(cls.nwbfile_paths, nwbfiles):
-            with NWBHDF5IO(path=nwbfile_path, mode="w") as io:
+            with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
                 io.write(nwbfile)
 
     @classmethod
     def tearDownClass(cls):
-        rmtree(cls.tempdir)
+        rmtree(cls.tempdir, ignore_errors=True)
 
     def test_inspect_nwbfile_dandi_config_critical_only_entire_registry(self):
         test_results = list(
@@ -615,6 +700,7 @@ class TestDANDIConfig(TestInspector):
                 checks=available_checks,
                 config=load_config(filepath_or_keyword="dandi"),
                 importance_threshold=Importance.CRITICAL,
+                skip_validate=self.skip_validate,
             )
         )
         true_results = [
@@ -646,6 +732,7 @@ class TestDANDIConfig(TestInspector):
                 checks=available_checks,
                 config=load_config(filepath_or_keyword="dandi"),
                 importance_threshold=Importance.BEST_PRACTICE_VIOLATION,
+                skip_validate=self.skip_validate,
             )
         )
         true_results = [
@@ -678,18 +765,27 @@ class TestDANDIConfig(TestInspector):
         console_output_file_path = self.tempdir / "test_console_output.txt"
 
         os.system(
-            f"nwbinspector {str(self.tempdir)} --overwrite --config dandi --threshold BEST_PRACTICE_VIOLATION"
+            f"nwbinspector {str(self.tempdir)} --overwrite --config dandi --threshold BEST_PRACTICE_VIOLATION "
+            f"--skip-validate "
             f"> {console_output_file_path}"
         )
 
         self.assertLogFileContentsEqual(
             test_file_path=console_output_file_path,
-            true_file_path=Path(__file__).parent / "true_nwbinspector_report_with_dandi_config.txt",
+            true_file_path=self.true_report_file_path,
             skip_first_newlines=True,
         )
 
 
-class TestCheckUniqueIdentifiersPass(TestCase):
+class TestDANDIConfigZarr(TestDANDIConfigHDF5):
+    BackendIOClass = BACKEND_IO_CLASSES["zarr"]
+    true_report_file_path = EXPECTED_REPORTS_FOLDER_PATH / "true_nwbinspector_report_with_dandi_config_zarr.txt"
+    skip_validate = True
+
+
+class TestCheckUniqueIdentifiersPassHDF5(TestCase):
+    BackendIOClass = BACKEND_IO_CLASSES["hdf5"]
+    skip_validate = True
     maxDiff = None
 
     @classmethod
@@ -700,20 +796,30 @@ class TestCheckUniqueIdentifiersPass(TestCase):
         for j in range(num_nwbfiles):
             unique_id_nwbfiles.append(make_minimal_nwbfile())
 
-        cls.unique_id_nwbfile_paths = [str(cls.tempdir / f"unique_id_testing{j}.nwb") for j in range(num_nwbfiles)]
+        suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
+        cls.unique_id_nwbfile_paths = [
+            str(cls.tempdir / f"unique_id_testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)
+        ]
         for nwbfile_path, nwbfile in zip(cls.unique_id_nwbfile_paths, unique_id_nwbfiles):
-            with NWBHDF5IO(path=nwbfile_path, mode="w") as io:
+            with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
                 io.write(nwbfile)
 
     @classmethod
     def tearDownClass(cls):
-        rmtree(cls.tempdir)
+        rmtree(cls.tempdir, ignore_errors=True)
 
     def test_check_unique_identifiers_pass(self):
-        assert list(inspect_all(path=self.tempdir, select=["check_data_orientation"])) == []
+        test_message = list(
+            inspect_all(path=self.tempdir, select=["check_data_orientation"], skip_validate=self.skip_validate)
+        )
+        expected_message = []
+
+        assert test_message == expected_message
 
 
-class TestCheckUniqueIdentifiersFail(TestCase):
+class TestCheckUniqueIdentifiersFailHDF5(TestCase):
+    BackendIOClass = BACKEND_IO_CLASSES["hdf5"]
+    skip_validate = True
     maxDiff = None
 
     @classmethod
@@ -730,19 +836,23 @@ class TestCheckUniqueIdentifiersFail(TestCase):
                 )
             )
 
+        suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
         cls.non_unique_id_nwbfile_paths = [
-            str(cls.tempdir / f"non_unique_id_testing{j}.nwb") for j in range(num_nwbfiles)
+            str(cls.tempdir / f"non_unique_id_testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)
         ]
         for nwbfile_path, nwbfile in zip(cls.non_unique_id_nwbfile_paths, non_unique_id_nwbfiles):
-            with NWBHDF5IO(path=nwbfile_path, mode="w") as io:
+            with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
                 io.write(nwbfile)
 
     @classmethod
     def tearDownClass(cls):
-        rmtree(cls.tempdir)
+        rmtree(cls.tempdir, ignore_errors=True)
 
     def test_check_unique_identifiers_fail(self):
-        assert list(inspect_all(path=self.tempdir, select=["check_data_orientation"])) == [
+        test_messages = list(
+            inspect_all(path=self.tempdir, select=["check_data_orientation"], skip_validate=self.skip_validate)
+        )
+        expected_messages = [
             InspectorMessage(
                 message=(
                     "The identifier 'not a unique identifier!' is used across the .nwb files: "
@@ -759,6 +869,16 @@ class TestCheckUniqueIdentifiersFail(TestCase):
             )
         ]
 
+        assert test_messages == expected_messages
+
+
+class TestCheckUniqueIdentifiersPassZarr(TestCheckUniqueIdentifiersPassHDF5):
+    BackendIOClass = BACKEND_IO_CLASSES["zarr"]
+
+
+class TestCheckUniqueIdentifiersFailZarr(TestCheckUniqueIdentifiersFailHDF5):
+    BackendIOClass = BACKEND_IO_CLASSES["zarr"]
+
 
 def test_dandi_config_in_vitro_injection():
     """Test that a subject_id starting with 'protein' excludes meaningless CRITICAL-elevated subject checks."""
@@ -774,7 +894,7 @@ def test_dandi_config_in_vitro_injection():
     assert messages == []
 
 
-def test_dandi_config_in_vitro_injection():
+def test_dandi_config_in_vitro_injection_safe():
     """Test the safe subject ID retrieval of the in vitro injection."""
     nwbfile = make_minimal_nwbfile()
     nwbfile.subject = Subject(subject_id=None, description="A detailed description about the in vitro setup.")

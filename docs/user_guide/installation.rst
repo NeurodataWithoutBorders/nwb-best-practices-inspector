@@ -6,7 +6,7 @@ If you haven't checked it out already, please read the :nwb-overview:`NWB Overvi
 
 The NWBInspector tool offers convenient command-line usage via any standard Conda or Python terminal.
 
-To install the package in any generic Python v3.8-v3.12 environment, simply type
+To install the package in any generic Python v3.9-v3.12 environment, simply type
 
 ::
 

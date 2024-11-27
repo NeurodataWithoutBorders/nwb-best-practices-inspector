@@ -62,11 +62,11 @@ class InspectorMessage:
     message: str
     importance: Importance = Importance.BEST_PRACTICE_SUGGESTION
     severity: Severity = Severity.LOW
-    check_function_name: str = None
-    object_type: str = None
-    object_name: str = None
+    check_function_name: Optional[str] = None
+    object_type: Optional[str] = None
+    object_name: Optional[str] = None
     location: Optional[str] = None
-    file_path: str = None
+    file_path: Optional[str] = None
 
     def __repr__(self):
         """Representation for InspectorMessage objects according to black format."""

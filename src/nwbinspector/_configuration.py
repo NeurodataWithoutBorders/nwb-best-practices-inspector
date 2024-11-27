@@ -1,29 +1,30 @@
 """Primary functions for inspecting NWBFiles."""
 
 import json
+from collections.abc import Callable
 from pathlib import Path
 from types import FunctionType
-from typing import List, Optional
+from typing import Optional, Union
 
 import jsonschema
 import yaml
 
-from nwbinspector.utils import PathType
+from ._registration import Importance, available_checks
 
-from . import available_checks
-from ._registration import Importance
+INTERNAL_CONFIGS: dict[str, Path] = dict(
+    dandi=Path(__file__).parent / "_internal_configs" / "dandi.inspector_config.yaml",
+)
 
-INTERNAL_CONFIGS = dict(dandi=Path(__file__).parent / "internal_configs" / "dandi.inspector_config.yaml")
 
-
-def validate_config(config: dict):
+def validate_config(config: dict) -> None:
     """Validate an instance of configuration against the official schema."""
-    with open(file=Path(__file__).parent / "config.schema.json", mode="r") as fp:
+    config_schema_file_path = Path(__file__).parent / "_internal_configs" / "config.schema.json"
+    with open(file=config_schema_file_path, mode="r") as fp:
         schema = json.load(fp=fp)
     jsonschema.validate(instance=config, schema=schema)
 
 
-def _copy_function(function):
+def _copy_function(function: Callable) -> Callable:
     """Copy the core parts of a given function, excluding wrappers, then return a new function."""
     copied_function = FunctionType(
         function.__code__, function.__globals__, function.__name__, function.__defaults__, function.__closure__
@@ -31,10 +32,11 @@ def _copy_function(function):
 
     # in case f was given attrs (note this dict is a shallow copy)
     copied_function.__dict__.update(function.__dict__)
+
     return copied_function
 
 
-def copy_check(check):
+def copy_check(check: Callable) -> Callable:
     """
     Copy a check function so that internal attributes can be adjusted without changing the original function.
 
@@ -44,11 +46,12 @@ def copy_check(check):
     see https://github.com/NeurodataWithoutBorders/nwbinspector/pull/218 for explanation.
     """
     copied_check = _copy_function(function=check)
-    copied_check.__wrapped__ = _copy_function(function=check.__wrapped__)
+    copied_check.__wrapped__ = _copy_function(function=check.__wrapped__)  # type: ignore
+
     return copied_check
 
 
-def load_config(filepath_or_keyword: PathType) -> dict:
+def load_config(filepath_or_keyword: Union[str, Path]) -> dict:
     """
     Load a config dictionary either via keyword search of the internal configs, or an explicit filepath.
 
@@ -56,17 +59,18 @@ def load_config(filepath_or_keyword: PathType) -> dict:
         - 'dandi'
             For all DANDI archive related practices, including validation and upload.
     """
-    file = INTERNAL_CONFIGS.get(filepath_or_keyword, filepath_or_keyword)
+    file = INTERNAL_CONFIGS.get(str(filepath_or_keyword), filepath_or_keyword)
     with open(file=file, mode="r") as stream:
-        config = yaml.load(stream=stream, Loader=yaml.Loader)
+        config = yaml.safe_load(stream=stream)
+
     return config
 
 
 def configure_checks(
-    checks: list = available_checks,
+    checks: Optional[list] = None,
     config: Optional[dict] = None,
-    ignore: Optional[List[str]] = None,
-    select: Optional[List[str]] = None,
+    ignore: Optional[list[str]] = None,
+    select: Optional[list[str]] = None,
     importance_threshold: Importance = Importance.BEST_PRACTICE_SUGGESTION,
 ) -> list:
     """
@@ -74,12 +78,12 @@ def configure_checks(
 
     Parameters
     ----------
+    checks : list of check functions, optional
+        If None, defaults to all registered checks.
     config : dict
         Dictionary valid against our JSON configuration schema.
         Can specify a mapping of importance levels and list of check functions whose importance you wish to change.
         Typically loaded via json.load from a valid .json file
-    checks : list of check functions
-        Defaults to all registered checks.
     ignore: list, optional
         Names of functions to skip.
     select: list, optional
@@ -97,6 +101,8 @@ def configure_checks(
 
         The default is the lowest level, BEST_PRACTICE_SUGGESTION.
     """
+    checks = checks or available_checks
+
     if ignore is not None and select is not None:
         raise ValueError("Options 'ignore' and 'select' cannot both be used.")
     if importance_threshold not in Importance:
@@ -104,9 +110,10 @@ def configure_checks(
             f"Indicated importance_threshold ({importance_threshold}) is not a valid importance level! Please choose "
             "from [CRITICAL_IMPORTANCE, BEST_PRACTICE_VIOLATION, BEST_PRACTICE_SUGGESTION]."
         )
+
+    checks_out: list = []
     if config is not None:
         validate_config(config=config)
-        checks_out = []
         ignore = ignore or []
         for check in checks:
             mapped_check = copy_check(check=check)
@@ -115,7 +122,7 @@ def configure_checks(
                     if importance_name == "SKIP":
                         ignore.append(check.__name__)
                         continue
-                    mapped_check.importance = Importance[importance_name]
+                    mapped_check.importance = Importance[importance_name]  # type: ignore
                     # Output wrappers are apparently parsed at time of wrapping not of time of output return...
                     # Attempting to re-wrap the copied function if the importance level is being adjusted...
                     # From https://github.com/NeurodataWithoutBorders/nwbinspector/issues/302
@@ -130,5 +137,6 @@ def configure_checks(
     elif ignore:
         checks_out = [x for x in checks_out if x.__name__ not in ignore]
     if importance_threshold:
-        checks_out = [x for x in checks_out if x.importance.value >= importance_threshold.value]
+        checks_out = [x for x in checks_out if x.importance.value >= importance_threshold.value]  # type: ignore
+
     return checks_out

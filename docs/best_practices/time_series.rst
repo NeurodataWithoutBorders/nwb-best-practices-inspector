@@ -19,8 +19,8 @@ Keep in mind that the dimensions are reversed in MatNWB, so in memory in MatNWB 
 
 In PyNWB the order of the dimensions is the same in memory as on disk, so the time index should be first.
 
-Check functions: :py:meth:`~nwbinspector.checks.time_series.check_data_orientation` and
-:py:meth:`~nwbinspector.checks.time_series.check_timestamps_match_first_dimension`
+Check functions: :py:meth:`~nwbinspector.checks._time_series.check_data_orientation` and
+:py:meth:`~nwbinspector.checks._time_series.check_timestamps_match_first_dimension`
 
 
 
@@ -35,7 +35,7 @@ Every :ref:`nwb-schema:sec-TimeSeries` instance has ``unit`` as an attribute, wh
 measurement for that data, using the appropriate type from the
 :wikipedia:`International System of Units (SI) <International_System_of_Units>`.
 
-Check function: :py:meth:`~nwbinspector.checks.time_series.check_missing_unit`
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_missing_unit`
 
 
 
@@ -82,7 +82,7 @@ A primary implication is that the values in :ref:`nwb-schema:TimeSeries.timestam
 corresponding ordering of their indices in the :ref:`nwb-schema:TimeSeries.data <sec-TimeSeries>` array, should always
 be strictly increasing.
 
-Check function: :py:meth:`~nwbinspector.checks.time_series.check_timestamps_ascending`
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_timestamps_ascending`
 
 
 
@@ -98,7 +98,7 @@ Ensure that all timestamps are valid numerical values. If gaps in time need to b
 data into separate :ref:`nwb-schema:sec-TimeSeries` objects with appropriate ``starting_time`` or use the ``timestamps``
 vector to explicitly represent time gaps.
 
-Check function: :py:meth:`~nwbinspector.checks.time_series.check_timestamps_without_nans`
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_timestamps_without_nans`
 
 
 
@@ -120,7 +120,7 @@ For segmented data, refer to the section covering :ref:`best_practice_timestamps
     2. Even if the sampling rate is constant within each segment, a single :ref:`nwb-schema:sec-TimeSeries` can be
     written using the ``timestamps`` vector to appropriately indicate the gaps between segments.
 
-Check function: :py:meth:`~nwbinspector.checks.time_series.check_regular_timestamps`
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_regular_timestamps`
 
 
 
@@ -161,8 +161,8 @@ chunk individually. This is especially important when writing NWBFiles that are 
 :pynwb-docs:`PyNWB tutorial <tutorials/advanced_io/h5dataio.html#compression-and-other-i-o-filters>` or the
 `MatNWB instructions <https://neurodatawithoutborders.github.io/matnwb/tutorials/html/dataPipe.html#2>`_
 
-Check functions: :py::meth:`~nwbinspector.checks.nwb_containers.check_large_dataset_compression`,
-:py::meth:`~nwbinspector.checks.nwb_containers.check_small_dataset_compression`
+Check functions: :py::meth:`~nwbinspector.checks._nwb_containers.check_large_dataset_compression`,
+:py::meth:`~nwbinspector.checks._nwb_containers.check_small_dataset_compression`
 
 
 
@@ -173,7 +173,7 @@ Unknown Resolution
 
 If the ``resolution`` of a :ref:`nwb-schema:sec-TimeSeries` is unknown, use ``-1.0`` or ``NaN`` to indicate this.
 
-Check function: :py::meth:`~nwbinspector.checks.time_series.check_resolution`
+Check function: :py::meth:`~nwbinspector.checks._time_series.check_resolution`
 
 
 
@@ -184,4 +184,4 @@ Zero Rate
 
 If the ``data`` field of :ref:`nwb-schema:sec-TimeSeries` has more than one frame, and according to :ref:`best_practice_data_orientation` this axis ought to be time, then the ``rate`` field should not be ``0.0``.
 
-Check function: :py::meth:`~nwbinspector.checks.time_series.check_rate_is_not_zero`
+Check function: :py::meth:`~nwbinspector.checks._time_series.check_rate_is_not_zero`

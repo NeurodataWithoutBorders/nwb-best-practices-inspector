@@ -1,7 +1,7 @@
 """Check functions that can apply to any descendant of DynamicTable."""
 
 from numbers import Real
-from typing import List, Optional
+from typing import Iterable, Optional
 
 import numpy as np
 from hdmf.common import DynamicTable, DynamicTableRegion, VectorIndex
@@ -21,7 +21,9 @@ NELEMS = 200
 
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=DynamicTableRegion)
-def check_dynamic_table_region_data_validity(dynamic_table_region: DynamicTableRegion, nelems: Optional[int] = NELEMS):
+def check_dynamic_table_region_data_validity(
+    dynamic_table_region: DynamicTableRegion, nelems: Optional[int] = NELEMS
+) -> Optional[InspectorMessage]:
     """Check if a DynamicTableRegion is valid."""
     if np.any(np.asarray(dynamic_table_region.data[:nelems]) > len(dynamic_table_region.table)):
         return InspectorMessage(
@@ -35,16 +37,22 @@ def check_dynamic_table_region_data_validity(dynamic_table_region: DynamicTableR
             message=f"Some elements of {dynamic_table_region.name} are out of range because they are less than 0."
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
-def check_empty_table(table: DynamicTable):
+def check_empty_table(table: DynamicTable) -> Optional[InspectorMessage]:
     """Check if a DynamicTable is empty."""
     if len(table.id) == 0:
         return InspectorMessage(message="This table has no data added to it.")
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeIntervals)
-def check_time_interval_time_columns(time_intervals: TimeIntervals, nelems: Optional[int] = NELEMS):
+def check_time_interval_time_columns(
+    time_intervals: TimeIntervals, nelems: Optional[int] = NELEMS
+) -> Optional[InspectorMessage]:
     """
     Check that time columns are in ascending order.
 
@@ -69,9 +77,13 @@ def check_time_interval_time_columns(time_intervals: TimeIntervals, nelems: Opti
             )
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeIntervals)
-def check_time_intervals_stop_after_start(time_intervals: TimeIntervals, nelems: Optional[int] = NELEMS):
+def check_time_intervals_stop_after_start(
+    time_intervals: TimeIntervals, nelems: Optional[int] = NELEMS
+) -> Optional[InspectorMessage]:
     """
     Check that all stop times on a TimeInterval object occur after their corresponding start times.
 
@@ -97,9 +109,13 @@ def check_time_intervals_stop_after_start(time_intervals: TimeIntervals, nelems:
             )
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
-def check_column_binary_capability(table: DynamicTable, nelems: Optional[int] = NELEMS):
+def check_column_binary_capability(
+    table: DynamicTable, nelems: Optional[int] = NELEMS
+) -> Optional[Iterable[InspectorMessage]]:
     """
     Check each column of a table to see if the data could be set as a boolean dtype.
 
@@ -138,8 +154,8 @@ def check_column_binary_capability(table: DynamicTable, nelems: Optional[int] = 
                 ["t", "f"],
                 ["hit", "miss"],
             ]
-            if any([set(parsed_unique_values) == set(pair) for pair in pairs_to_check]):
-                saved_bytes = (unique_values.dtype.itemsize - 1) * np.product(
+            if any([set(parsed_unique_values) == set(pair) for pair in pairs_to_check]):  # type: ignore
+                saved_bytes = (unique_values.dtype.itemsize - 1) * np.prod(
                     get_data_shape(data=column.data, strict_no_data_load=True)
                 )
                 if unique_values.dtype == "float":
@@ -157,32 +173,40 @@ def check_column_binary_capability(table: DynamicTable, nelems: Optional[int] = 
                         f"save {format_byte_size(byte_size=saved_bytes)}."
                     )
                 )
+    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
 def check_single_row(
     table: DynamicTable,
-    exclude_types: Optional[list] = (Units,),
-    exclude_names: Optional[List[str]] = ("electrodes",),
-):
+    exclude_types: Optional[tuple] = None,
+    exclude_names: Optional[tuple[str]] = None,
+) -> Optional[InspectorMessage]:
     """
     Check if DynamicTable has only a single row; may be better represented by another data type.
 
     Skips the Units table since it is OK to have only a single spiking unit.
     Skips the Electrode table since it is OK to have only a single electrode.
     """
+    exclude_types = exclude_types or (Units,)
+    exclude_names = exclude_names or ("electrodes",)
+
     if any((isinstance(table, exclude_type) for exclude_type in exclude_types)):
-        return
+        return None
     if any((table.name == exclude_name for exclude_name in exclude_names)):
-        return
+        return None
     if len(table.id) == 1:
         return InspectorMessage(
             message="This table has only a single row; it may be better represented by another data type."
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
-def check_table_values_for_dict(table: DynamicTable, nelems: Optional[int] = NELEMS):
+def check_table_values_for_dict(
+    table: DynamicTable, nelems: Optional[int] = NELEMS
+) -> Optional[Iterable[InspectorMessage]]:
     """Check if any values in a row or column of a table contain a string casting of a Python dictionary."""
     for column in table.columns:
         if not hasattr(column, "data") or isinstance(column, VectorIndex) or not isinstance(column.data[0], str):
@@ -197,9 +221,11 @@ def check_table_values_for_dict(table: DynamicTable, nelems: Optional[int] = NEL
                     message += " This string is also JSON loadable, so call `json.loads(...)` on the string to unpack."
                 yield InspectorMessage(message=message)
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
-def check_col_not_nan(table: DynamicTable, nelems: Optional[int] = NELEMS):
+def check_col_not_nan(table: DynamicTable, nelems: Optional[int] = NELEMS) -> Optional[Iterable[InspectorMessage]]:
     """Check if all the values in a single column of a table are NaN."""
     for column in table.columns:
         if (
@@ -217,9 +243,11 @@ def check_col_not_nan(table: DynamicTable, nelems: Optional[int] = NELEMS):
         if all(np.isnan(column[slice(0, None, slice_by)]).flatten()):
             yield InspectorMessage(message=message)
 
+    return None
+
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=DynamicTable)
-def check_ids_unique(table: DynamicTable, nelems: Optional[int] = NELEMS):
+def check_ids_unique(table: DynamicTable, nelems: Optional[int] = NELEMS) -> Optional[InspectorMessage]:
     """
     Ensure that the values of the id attribute of a DynamicTable are unique.
 
@@ -239,9 +267,11 @@ def check_ids_unique(table: DynamicTable, nelems: Optional[int] = NELEMS):
     if len(set(data)) != len(data):
         return InspectorMessage(message="This table has ids that are not unique.")
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
-def check_table_time_columns_are_not_negative(table: DynamicTable):
+def check_table_time_columns_are_not_negative(table: DynamicTable) -> Optional[Iterable[InspectorMessage]]:
     """
     Check that time columns are not negative.
 
@@ -259,3 +289,5 @@ def check_table_time_columns_are_not_negative(table: DynamicTable):
                     message=f"Timestamps in column {column_name} should not be negative."
                     " It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
                 )
+
+    return None

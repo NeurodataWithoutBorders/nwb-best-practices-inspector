@@ -1,0 +1,32 @@
+name: Test against DANDI dev branch - all tests, including live services
+on: workflow_call
+
+jobs:
+  build-and-test:
+    name: Testing against current DANDI release and dev branch
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout local branch of source repository
+        uses: actions/checkout@v4
+      - run: git fetch --prune --unshallow --tags
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test against DANDI dev
+        run: |
+          pip install virtualenv
+          virtualenv --system-site-packages --python=python3 venvs/dandi_dev_tests
+          source venvs/dandi_dev_tests/bin/activate
+          pip install -e .[dandi]
+          cd ..
+          git clone https://github.com/dandi/dandi-cli
+          cd dandi-cli
+          pip install -e .[test]
+          pip install hdmf==3.14.3  # temporary: https://github.com/dandi/dandi-cli/issues/1494
+          pytest -vv

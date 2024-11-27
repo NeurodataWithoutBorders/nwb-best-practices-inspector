@@ -2,12 +2,12 @@
 
 import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Dict, Optional
+from typing import Optional
 
 from ..utils import calculate_number_of_cpu, is_module_installed
 
 
-def get_s3_urls_and_dandi_paths(dandiset_id: str, version_id: Optional[str] = None, n_jobs: int = 1) -> Dict[str, str]:
+def get_s3_urls_and_dandi_paths(dandiset_id: str, version_id: Optional[str] = None, n_jobs: int = 1) -> dict[str, str]:
     """
     Collect S3 URLS from a DANDISet ID.
 
@@ -46,7 +46,11 @@ def get_s3_urls_and_dandi_paths(dandiset_id: str, version_id: Optional[str] = No
     return s3_urls_to_dandi_paths
 
 
-def _get_content_url_and_path(asset, follow_redirects: int = 1, strip_query: bool = True) -> Dict[str, str]:
+def _get_content_url_and_path(
+    asset: "dandi.dandiapi.BaseRemoteAsset",  # type: ignore
+    follow_redirects: int = 1,
+    strip_query: bool = True,
+) -> dict[str, str]:
     """
     Private helper function for parallelization in 'get_s3_urls_and_dandi_paths'.
 

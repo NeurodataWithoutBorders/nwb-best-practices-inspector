@@ -1,5 +1,7 @@
 """Checks for types belonging to the pynwb.behavior module."""
 
+from typing import Iterable, Optional
+
 import numpy as np
 from pynwb.behavior import CompassDirection, SpatialSeries
 
@@ -7,7 +9,7 @@ from .._registration import Importance, InspectorMessage, register_check
 
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=SpatialSeries)
-def check_spatial_series_dims(spatial_series: SpatialSeries):
+def check_spatial_series_dims(spatial_series: SpatialSeries) -> Optional[InspectorMessage]:
     """
     Check if a SpatialSeries has the correct dimensions.
 
@@ -18,9 +20,11 @@ def check_spatial_series_dims(spatial_series: SpatialSeries):
             message="SpatialSeries should have 1 column (x), 2 columns (x, y), or 3 columns (x, y, z)."
         )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=CompassDirection)
-def check_compass_direction_unit(compass_direction: CompassDirection):
+def check_compass_direction_unit(compass_direction: CompassDirection) -> Optional[Iterable[InspectorMessage]]:
     """
     Check that SpatialSeries objects within CompassDirection objects have units 'degrees' or 'radians'.
 
@@ -33,9 +37,13 @@ def check_compass_direction_unit(compass_direction: CompassDirection):
                 f"unit of 'degrees' or 'radians', but '{spatial_series.name}' has units '{spatial_series.unit}'."
             )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=SpatialSeries)
-def check_spatial_series_radians_magnitude(spatial_series: SpatialSeries, nelems: int = 200):
+def check_spatial_series_radians_magnitude(
+    spatial_series: SpatialSeries, nelems: int = 200
+) -> Optional[InspectorMessage]:
     """
     Check that SpatialSeries with units radians have data values between -2*pi and 2*pi.
 
@@ -48,9 +56,13 @@ def check_spatial_series_radians_magnitude(spatial_series: SpatialSeries, nelems
                 message="SpatialSeries with units of radians must have values between -2pi and 2pi."
             )
 
+    return None
+
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=SpatialSeries)
-def check_spatial_series_degrees_magnitude(spatial_series: SpatialSeries, nelems: int = 200):
+def check_spatial_series_degrees_magnitude(
+    spatial_series: SpatialSeries, nelems: int = 200
+) -> Optional[InspectorMessage]:
     """
     Check that SpatialSeries with units of degrees have data values between -360 and 360.
 
@@ -62,3 +74,5 @@ def check_spatial_series_degrees_magnitude(spatial_series: SpatialSeries, nelems
             return InspectorMessage(
                 message="SpatialSeries with units of degrees must have values between -360 and 360."
             )
+
+    return None

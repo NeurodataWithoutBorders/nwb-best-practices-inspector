@@ -6,7 +6,7 @@ Check Functions
 
 NWBFile Metadata
 ----------------
-.. automodule:: nwbinspector.checks.nwbfile_metadata
+.. automodule:: nwbinspector.checks._nwbfile_metadata
 
 General
 -------
@@ -14,35 +14,35 @@ General
 
 NWB Containers
 --------------
-.. automodule:: nwbinspector.checks.nwb_containers
+.. automodule:: nwbinspector.checks._nwb_containers
 
 Time Series
 -----------
-.. automodule:: nwbinspector.checks.time_series
+.. automodule:: nwbinspector.checks._time_series
 
 Tables
 ------
-.. automodule:: nwbinspector.checks.tables
+.. automodule:: nwbinspector.checks._tables
 
 Behavior
 --------
-.. automodule:: nwbinspector.checks.behavior
+.. automodule:: nwbinspector.checks._behavior
 
 Intracellular Electrophysiology (icephys)
 -----------------------------------------
-.. automodule:: nwbinspector.checks.icephys
+.. automodule:: nwbinspector.checks._icephys
 
 Extracellular Electrophysiology (ecephys)
 -----------------------------------------
-.. automodule:: nwbinspector.checks.ecephys
+.. automodule:: nwbinspector.checks._ecephys
 
 Optical Electrophysiology (ophys)
 ---------------------------------
-.. automodule:: nwbinspector.checks.ophys
+.. automodule:: nwbinspector.checks._ophys
 
 Optogenetics (ogen)
 -------------------
-.. automodule:: nwbinspector.checks.ogen
+.. automodule:: nwbinspector.checks._ogen
 
 ImageSeries
 -----------

@@ -42,7 +42,7 @@ Slash characters ``'/'`` and ``'\'``  should not be used in the ``name`` of an o
 
 For mathematical expressions, instead of including the special character in the name, please use an English equivalent instead. *E.g.*, instead of "Df/f" use "DfOverF".
 
-Check function: :py:meth:`~nwbinspector.checks.general.check_name_slashes`
+Check function: :py:meth:`~nwbinspector.checks._general.check_name_slashes`
 
 
 
@@ -55,7 +55,7 @@ The :py:attr:`name` of an object is for identifying that object within the file;
 
 It is acceptable to name an object something like ``ElectricalSeriesFromProbe1`` as per the uniqueness requirement of :ref:`best_practice_object_names`, however the name alone is not sufficient documentation of the signal source. In this case, the source of the signal will be clear from the :ref:`nwb-schema:devices` linkage in the rows of the passed :ref:`hdmf-schema:sec-dynamictableregion` subsetting the full ``ElectrodeTable``, so you would not need to add any explicit metadata explaining these details.
 
-Check function: :py:meth:`~nwbinspector.checks.general.check_description`
+Check function: :py:meth:`~nwbinspector.checks._general.check_description`
 
 
 

@@ -8,7 +8,7 @@ from collections import defaultdict
 sys.path.append(str(Path(__file__).parent))
 from conf_extlinks import extlinks, intersphinx_mapping
 
-sys.path.insert(0, Path(__file__).resolve().parents[1])
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 project = "NWBInspector"
 copyright = "2022-2024, CatalystNeuro"

@@ -1,14 +1,14 @@
 """Internally used tools specifically for rendering more human-readable output from collected check results."""
 
 from enum import Enum
-from typing import List, Optional
+from typing import Optional
 
 from natsort import natsorted
 
 from ._registration import InspectorMessage
 
 
-def _sort_unique_values(unique_values: list, reverse: bool = False):
+def _sort_unique_values(unique_values: list, reverse: bool = False) -> list:
     """Technically, the 'set' method applies basic sorting to the unique contents, but natsort is more general."""
     if any(unique_values) and isinstance(unique_values[0], Enum):
         return natsorted(unique_values, key=lambda x: -x.value, reverse=reverse)
@@ -16,7 +16,9 @@ def _sort_unique_values(unique_values: list, reverse: bool = False):
         return natsorted(unique_values, reverse=reverse)
 
 
-def organize_messages(messages: List[InspectorMessage], levels: List[str], reverse: Optional[List[bool]] = None):
+def organize_messages(
+    messages: list[Optional[InspectorMessage]], levels: list[str], reverse: Optional[list[bool]] = None
+) -> dict:
     """
     General function for organizing list of InspectorMessages.
 
@@ -25,9 +27,12 @@ def organize_messages(messages: List[InspectorMessage], levels: List[str], rever
     Parameters
     ----------
     messages : list of InspectorMessages
-    levels: list of strings
+    levels : list of strings
         Each string in this list must correspond onto an attribute of the InspectorMessage class, excluding the
         'message' text and 'object_name' (this will be coupled to the 'object_type').
+    reverse : list of bool, optional
+        If provided, this should be a list of booleans that correspond to the 'levels' argument.
+        If True, the values will be sorted in reverse order.
     """
     assert all([x not in levels for x in ["message", "object_name", "severity"]]), (
         "You must specify levels to organize by that correspond to attributes of the InspectorMessage class, excluding "
