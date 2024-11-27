@@ -32,7 +32,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pynwb>=2.8",   # NWB Inspector should always be used with most recent minor versions of PyNWB
+    "pynwb>=2.8,<3",   # NWB Inspector should always be used with most recent minor versions of PyNWB
     "hdmf-zarr",
     "fsspec",
     "s3fs",
