@@ -25,9 +25,13 @@ def check_description(neurodata_object: object) -> Optional[InspectorMessage]:
     """
     if not hasattr(neurodata_object, "description"):
         return None
-    if neurodata_object.description is None or neurodata_object.description.strip(" ") == "":
+
+    description = neurodata_object.description
+    if description is not None and type(description) is not str:
+        return None
+    if description is None or description.strip(" ") == "":
         return InspectorMessage(message="Description is missing.")
-    if neurodata_object.description.lower().strip(".") in COMMON_DESCRIPTION_PLACEHOLDERS:
-        return InspectorMessage(message=f"Description ('{neurodata_object.description}') is a placeholder.")
+    if description.lower().strip(".") in COMMON_DESCRIPTION_PLACEHOLDERS:
+        return InspectorMessage(message=f"Description ('{description}') is a placeholder.")
 
     return None

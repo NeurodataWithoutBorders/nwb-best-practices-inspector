@@ -1,4 +1,4 @@
-from hdmf.common import DynamicTable
+from hdmf.common import DynamicTable, DynamicTableRegion
 
 from nwbinspector import Importance, InspectorMessage
 from nwbinspector.checks import check_description, check_name_slashes
@@ -50,3 +50,25 @@ def test_check_description_missing():
         object_name="test",
         location="/",
     )
+
+
+def test_check_description_feature_extraction():
+    import numpy as np
+    from pynwb.ecephys import FeatureExtraction
+    from pynwb.testing.mock.ecephys import mock_ElectrodeTable
+
+    electrodes = mock_ElectrodeTable()
+
+    dynamic_table_region = DynamicTableRegion(
+        name="electrodes", description="I am wrong", data=[0, 1, 2, 3, 4], table=electrodes
+    )
+
+    feature_extraction = FeatureExtraction(
+        name="PCA_features",
+        electrodes=dynamic_table_region,
+        description=["PC1", "PC2", "PC3", "PC4"],
+        times=[0.033, 0.066, 0.099],
+        features=np.random.rand(3, 5, 4),  # time, channel, feature
+    )
+
+    assert check_description(neurodata_object=feature_extraction) is None
