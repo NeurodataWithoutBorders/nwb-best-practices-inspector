@@ -49,9 +49,5 @@ ImageSeries
 .. automodule:: nwbinspector.checks._image_series
 
 Images
------------
-.. automodule:: nwbinspector.checks._images
-
-Images
 ------
-.. automodule:: nwbinspector.checks.images
+.. automodule:: nwbinspector.checks._images
