@@ -1,7 +1,7 @@
 from hdmf.common import DynamicTable, DynamicTableRegion
 
 from nwbinspector import Importance, InspectorMessage
-from nwbinspector.checks import check_description, check_name_slashes
+from nwbinspector.checks import check_description, check_name_slashes, check_name_colons
 
 
 def test_check_name_slashes_pass():
@@ -39,7 +39,7 @@ def test_check_name_colons_pass():
     assert check_name_colons(neurodata_object=table) is None
 
 
-def test_check_name_slashes_fail():
+def test_check_name_colons_fail():
     # the latest version of HDMF/PyNWB forbids ":" in the object names when creating a new object
     # so we use in_construct_mode=True to simulate an object that was read from a file
     table = DynamicTable.__new__(DynamicTable, in_construct_mode=True)
