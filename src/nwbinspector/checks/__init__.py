@@ -92,6 +92,7 @@ __all__ = [
     "check_spike_times_not_in_unobserved_interval",
     "check_description",
     "check_name_slashes",
+    "check_name_colons",
     "check_image_series_data_size",
     "check_image_series_external_file_relative",
     "check_image_series_external_file_valid",
