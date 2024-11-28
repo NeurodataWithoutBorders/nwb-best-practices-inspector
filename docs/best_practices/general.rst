@@ -34,6 +34,7 @@ It is recommended to use :wikipedia:`CamelCase <Camel_case>` when naming instanc
 
 
 .. _best_practice_name_slashes:
+.. _best_practice_name_colons:
 
 Do Not Use Slashes or Colons in Names
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
