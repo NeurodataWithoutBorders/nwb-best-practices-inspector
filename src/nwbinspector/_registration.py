@@ -103,8 +103,6 @@ def _auto_parse(
 
         return auto_parsed_result
 
-    return None
-
 
 def _parse_location(neurodata_object: object) -> Optional[str]:
     """Grab the object location from a dataset or a container content that is an dataset object."""
@@ -132,5 +130,3 @@ def _parse_location(neurodata_object: object) -> Optional[str]:
                 return field.parent.name  # type: ignore
             elif isinstance(field, zarr.Array):
                 return field.name.removesuffix(f"/{field_name}")
-
-    return None

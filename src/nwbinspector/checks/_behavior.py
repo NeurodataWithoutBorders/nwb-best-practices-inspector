@@ -20,8 +20,6 @@ def check_spatial_series_dims(spatial_series: SpatialSeries) -> Optional[Inspect
             message="SpatialSeries should have 1 column (x), 2 columns (x, y), or 3 columns (x, y, z)."
         )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=CompassDirection)
 def check_compass_direction_unit(compass_direction: CompassDirection) -> Optional[Iterable[InspectorMessage]]:
@@ -36,8 +34,6 @@ def check_compass_direction_unit(compass_direction: CompassDirection) -> Optiona
                 message=f"SpatialSeries objects inside a CompassDirection object should be angular and should have a "
                 f"unit of 'degrees' or 'radians', but '{spatial_series.name}' has units '{spatial_series.unit}'."
             )
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=SpatialSeries)
@@ -56,8 +52,6 @@ def check_spatial_series_radians_magnitude(
                 message="SpatialSeries with units of radians must have values between -2pi and 2pi."
             )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=SpatialSeries)
 def check_spatial_series_degrees_magnitude(
@@ -74,5 +68,3 @@ def check_spatial_series_degrees_magnitude(
             return InspectorMessage(
                 message="SpatialSeries with units of degrees must have values between -360 and 360."
             )
-
-    return None

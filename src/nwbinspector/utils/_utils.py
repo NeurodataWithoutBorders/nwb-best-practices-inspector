@@ -231,12 +231,10 @@ def get_data_shape(data: Any, strict_no_data_load: bool = False) -> Optional[tup
     if hasattr(data, "shape") and data.shape is not None:
         return data.shape
     if isinstance(data, dict):
-        return None
+        return
     if hasattr(data, "__len__") and not isinstance(data, (str, bytes)):
         if not strict_no_data_load or isinstance(data, (list, tuple, set)):
             return __get_shape_helper(data)
-
-    return None
 
 
 def strtobool(val: str) -> bool:

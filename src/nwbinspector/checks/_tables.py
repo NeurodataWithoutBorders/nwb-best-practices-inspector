@@ -37,16 +37,12 @@ def check_dynamic_table_region_data_validity(
             message=f"Some elements of {dynamic_table_region.name} are out of range because they are less than 0."
         )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
 def check_empty_table(table: DynamicTable) -> Optional[InspectorMessage]:
     """Check if a DynamicTable is empty."""
     if len(table.id) == 0:
         return InspectorMessage(message="This table has no data added to it.")
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeIntervals)
@@ -77,8 +73,6 @@ def check_time_interval_time_columns(
             )
         )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=TimeIntervals)
 def check_time_intervals_stop_after_start(
@@ -108,8 +102,6 @@ def check_time_intervals_stop_after_start(
                 "session start time."
             )
         )
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
@@ -173,7 +165,6 @@ def check_column_binary_capability(
                         f"save {format_byte_size(byte_size=saved_bytes)}."
                     )
                 )
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
@@ -192,15 +183,13 @@ def check_single_row(
     exclude_names = exclude_names or ("electrodes",)
 
     if any((isinstance(table, exclude_type) for exclude_type in exclude_types)):
-        return None
+        return
     if any((table.name == exclude_name for exclude_name in exclude_names)):
-        return None
+        return
     if len(table.id) == 1:
         return InspectorMessage(
             message="This table has only a single row; it may be better represented by another data type."
         )
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=DynamicTable)
@@ -221,8 +210,6 @@ def check_table_values_for_dict(
                     message += " This string is also JSON loadable, so call `json.loads(...)` on the string to unpack."
                 yield InspectorMessage(message=message)
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
 def check_col_not_nan(table: DynamicTable, nelems: Optional[int] = NELEMS) -> Optional[Iterable[InspectorMessage]]:
@@ -242,8 +229,6 @@ def check_col_not_nan(table: DynamicTable, nelems: Optional[int] = NELEMS) -> Op
         message = message.replace("might have", "has") if nelems is None or slice_by == 1 else message
         if all(np.isnan(column[slice(0, None, slice_by)]).flatten()):
             yield InspectorMessage(message=message)
-
-    return None
 
 
 @register_check(importance=Importance.CRITICAL, neurodata_type=DynamicTable)
@@ -267,8 +252,6 @@ def check_ids_unique(table: DynamicTable, nelems: Optional[int] = NELEMS) -> Opt
     if len(set(data)) != len(data):
         return InspectorMessage(message="This table has ids that are not unique.")
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=DynamicTable)
 def check_table_time_columns_are_not_negative(table: DynamicTable) -> Optional[Iterable[InspectorMessage]]:
@@ -289,5 +272,3 @@ def check_table_time_columns_are_not_negative(table: DynamicTable) -> Optional[I
                     message=f"Timestamps in column {column_name} should not be negative."
                     " It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
                 )
-
-    return None

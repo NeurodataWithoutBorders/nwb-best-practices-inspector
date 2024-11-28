@@ -14,6 +14,6 @@ def check_optogenetic_stimulus_site_has_optogenetic_series(
     for obj in nwbfile.objects.values():
         if isinstance(obj, OptogeneticSeries):
             if obj.site == ogen_site:
-                return None
+                return
 
     return InspectorMessage(message="OptogeneticStimulusSite is not referenced by any OptogeneticSeries.")

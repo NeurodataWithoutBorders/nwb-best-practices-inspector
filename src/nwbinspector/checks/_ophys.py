@@ -39,8 +39,6 @@ def check_roi_response_series_dims(roi_response_series: RoiResponseSeries) -> Op
             message="The second dimension of data does not match the length of rois. Your data may be transposed."
         )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=RoiResponseSeries)
 def check_roi_response_series_link_to_plane_segmentation(
@@ -54,8 +52,6 @@ def check_roi_response_series_link_to_plane_segmentation(
     if not isinstance(roi_response_series.rois.table, PlaneSegmentation):
         return InspectorMessage(message="rois field does not point to a PlaneSegmentation table.")
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=OpticalChannel)
 def check_emission_lambda_in_nm(optical_channel: OpticalChannel) -> Optional[InspectorMessage]:
@@ -67,8 +63,6 @@ def check_emission_lambda_in_nm(optical_channel: OpticalChannel) -> Optional[Ins
     if optical_channel.emission_lambda < MIN_LAMBDA:
         return InspectorMessage(f"emission lambda of {optical_channel.emission_lambda} should be in units of nm.")
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=ImagingPlane)
 def check_excitation_lambda_in_nm(imaging_plane: ImagingPlane) -> Optional[InspectorMessage]:
@@ -79,8 +73,6 @@ def check_excitation_lambda_in_nm(imaging_plane: ImagingPlane) -> Optional[Inspe
     """
     if imaging_plane.excitation_lambda < MIN_LAMBDA:
         return InspectorMessage(f"excitation lambda of {imaging_plane.excitation_lambda} should be in units of nm.")
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=PlaneSegmentation)
@@ -96,5 +88,3 @@ def check_plane_segmentation_image_mask_shape_against_ref_images(
                     f"image_mask of shape {mask_shape} does not match reference image {ref_image.name} with shape"
                     f" {ref_image.data.shape[1:]}."
                 )
-
-    return None

@@ -121,7 +121,7 @@ def inspect_all(
         ):
             yield message
 
-        return None
+        return
 
     calculated_number_of_jobs = calculate_number_of_cpu(requested_cpu=n_jobs)
     if progress_bar_options is None:

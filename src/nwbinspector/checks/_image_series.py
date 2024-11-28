@@ -19,7 +19,7 @@ def check_image_series_external_file_valid(image_series: ImageSeries) -> Optiona
     Best Practice: :ref:`best_practice_use_external_mode`
     """
     if image_series.external_file is None:
-        return None
+        return
     nwbfile_path = Path(get_nwbfile_path_from_internal_object(neurodata_object=image_series))
     for file_path in image_series.external_file:
         file_path = file_path.decode() if isinstance(file_path, bytes) else file_path
@@ -31,8 +31,6 @@ def check_image_series_external_file_valid(image_series: ImageSeries) -> Optiona
                 )
             )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=ImageSeries)
 def check_image_series_external_file_relative(image_series: ImageSeries) -> Optional[Iterable[InspectorMessage]]:
@@ -42,7 +40,7 @@ def check_image_series_external_file_relative(image_series: ImageSeries) -> Opti
     Best Practice: :ref:`best_practice_use_external_mode`
     """
     if image_series.external_file is None:
-        return None
+        return
     for file_path in image_series.external_file:
         file_path = file_path.decode() if isinstance(file_path, bytes) else file_path
         if ntpath.isabs(file_path):  # ntpath required for cross-platform detection
@@ -52,8 +50,6 @@ def check_image_series_external_file_relative(image_series: ImageSeries) -> Opti
                     "Please adjust the absolute path to be relative to the location of the NWBFile."
                 )
             )
-
-    return None
 
 
 @register_check(importance=Importance.BEST_PRACTICE_VIOLATION, neurodata_type=ImageSeries)
@@ -66,7 +62,7 @@ def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: floa
     # False positive case; TwoPhotonSeries are a subclass of ImageSeries, but it is very common and perfectly fine
     # to write lots of data using one without an external file
     if isinstance(image_series, TwoPhotonSeries):
-        return None
+        return
 
     data = image_series.data
 
@@ -77,5 +73,3 @@ def check_image_series_data_size(image_series: ImageSeries, gb_lower_bound: floa
 
     if data_size_gb > gb_lower_bound:
         return InspectorMessage(message="ImageSeries is very large. Consider using external mode for better storage.")
-
-    return None

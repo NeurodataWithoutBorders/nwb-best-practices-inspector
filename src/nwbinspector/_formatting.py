@@ -238,8 +238,6 @@ def print_to_console(formatted_messages: list[str]) -> None:
     for line in formatted_messages:
         sys.stdout.write(line + "\n")
 
-    return None
-
 
 def save_report(report_file_path: Union[str, Path], formatted_messages: list[str], overwrite: bool = False) -> None:
     """Write the list of organized check results to a nicely formatted text file."""
@@ -251,5 +249,3 @@ def save_report(report_file_path: Union[str, Path], formatted_messages: list[str
     with open(file=report_file_path, mode="w", newline="\n") as file:
         for line in formatted_messages:
             file.write(line + "\n")
-
-    return None

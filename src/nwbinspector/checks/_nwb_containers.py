@@ -38,8 +38,6 @@ def check_large_dataset_compression(
                 message=f"{os.path.split(field.name)[1]} is a large uncompressed dataset! Please enable compression.",
             )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=NWBContainer)
 def check_small_dataset_compression(
@@ -82,8 +80,6 @@ def check_small_dataset_compression(
                 ),
             )
 
-    return None
-
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=NWBContainer)
 def check_empty_string_for_optional_attribute(nwb_container: NWBContainer) -> Optional[Iterable[InspectorMessage]]:
@@ -108,5 +104,3 @@ def check_empty_string_for_optional_attribute(nwb_container: NWBContainer) -> Op
             message=f'The attribute "{field}" is optional and you have supplied an empty string. Improve my omitting '
             "this attribute (in MatNWB or PyNWB) or entering as None (in PyNWB)"
         )
-
-    return None
