@@ -13,6 +13,7 @@ from ._ecephys import (
 from ._general import (
     check_description,
     check_name_slashes,
+    check_name_colons,
 )
 from ._icephys import (
     check_intracellular_electrode_cell_id_exists,
