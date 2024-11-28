@@ -18,7 +18,7 @@ def check_name_slashes(neurodata_object: object) -> Optional[InspectorMessage]:
 
 @register_check(importance=Importance.BEST_PRACTICE_SUGGESTION, neurodata_type=None)
 def check_name_colons(neurodata_object: object) -> Optional[InspectorMessage]:
-    """Check if there  has been added for the session."""
+    """Check if an object contains a colon."""
     if hasattr(neurodata_object, "name") and ":" in neurodata_object.name:
         return InspectorMessage(message="Object name contains colons.")
 
