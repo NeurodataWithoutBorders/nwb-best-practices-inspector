@@ -1,5 +1,8 @@
 # Upcoming
 
+
+# v0.6.1
+
 ### Improvements
 * Added support for Numpy 2 and h5py 3.12, and pinned PyNWB to <3.0 temporarily. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
 
