@@ -56,3 +56,32 @@ a linux system, run
     export NWBI_SKIP_NETWORK_TESTS=1
 
 in your environment before running ``pytest``.
+
+
+Making a Release
+----------------
+
+To prepare a release, follow these steps and make a new pull request with the changes:
+
+    1. Update the ``CHANGELOG.md`` header with the upcoming version number and ensure all upcoming changes are included.
+    2. Update the version string in ``pyproject.toml``.
+    3. Check the requirements versions and update if needed.
+    4. Update dates in ``docs/conf.py`` and ``license.txt`` to the current year if needed.
+
+After merging, follow these steps:
+
+    1. Create a new git tag. Pull the latest dev branch, then run the following commands (updating the release version)
+       to create the tag and push to GitHub.
+
+    .. code-block::
+
+        release=X.Y.Z
+        git tag ${release} --sign -m "nwbinspector ${release}"
+        git push --tags
+
+    2. On the `GitHub tags <https://github.com/NeurodataWithoutBorders/nwbinspector/tags>`_ page, click "..." -> "Create release" on the new tag.
+       Fill in the release notes from the ``CHANGELOG.md`` and publish the release.
+    3. Publishing a release on GitHub will trigger the ``auto-publish.yml`` action on the CI that will publish the package on PyPi.
+    4. Conda-forge maintains a bot that regularly monitors PyPi for new releases of packages that are also on conda-forge.
+       When a new release is detected, the bot will create a pull request. Follow the instructions in that pull request to update any requirements.
+       Once the PR is approved and merged, a new release will be published on conda-forge.
