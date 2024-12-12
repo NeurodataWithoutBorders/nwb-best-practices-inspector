@@ -146,7 +146,7 @@ This is especially important when writing NWBFiles that are intended to be uploa
 
 For more information about how to enable chunking and compression on your data, consult the
 :pynwb-docs:`PyNWB tutorial <tutorials/advanced_io/h5dataio.html#chunking>` or the
-`MatNWB instructions <https://neurodatawithoutborders.github.io/matnwb/tutorials/html/dataPipe.html#2>`_.
+`MatNWB instructions <https://matnwb.readthedocs.io/en/latest/pages/tutorials/dataPipe.html>`_.
 
 
 
@@ -159,7 +159,7 @@ Data writers can optimize the storage of large data arrays for particular uses b
 chunk individually. This is especially important when writing NWBFiles that are intended to be uploaded to the
 :dandi-archive:`DANDI Archive <>` for storage, sharing, and publication. For more information about how to enable compression on your data, consult the
 :pynwb-docs:`PyNWB tutorial <tutorials/advanced_io/h5dataio.html#compression-and-other-i-o-filters>` or the
-`MatNWB instructions <https://neurodatawithoutborders.github.io/matnwb/tutorials/html/dataPipe.html#2>`_
+`MatNWB instructions <https://matnwb.readthedocs.io/en/latest/pages/tutorials/dataPipe.html>`_
 
 Check functions: :py::meth:`~nwbinspector.checks._nwb_containers.check_large_dataset_compression`,
 :py::meth:`~nwbinspector.checks._nwb_containers.check_small_dataset_compression`
