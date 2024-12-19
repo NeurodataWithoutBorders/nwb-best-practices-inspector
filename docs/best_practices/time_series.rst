@@ -126,7 +126,7 @@ Check function: :py:meth:`~nwbinspector.checks._time_series.check_regular_timest
 .. _best_practice_avoid_negative_timestamps:
 
 Avoid Negative Timestamps
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When writing :ref:`nwb-schema:sec-TimeSeries` data, avoid using negative timestamps.
 
