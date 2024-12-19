@@ -125,7 +125,7 @@ def check_timestamp_of_the_first_sample_is_not_negative(time_series: TimeSeries)
     """
     Check that the timestamp of the first sample is not negative.
 
-    Best Practice: :ref:`best_practice_global_time_reference`
+    Best Practice: :ref:`best_practice_avoid_negative_timestamps`
     """
 
     first_timestamp = time_series.starting_time if time_series.starting_time is not None else time_series.timestamps[0]
