@@ -134,6 +134,10 @@ All timestamps in the NWBFile are written with respect to a global reference poi
 
 While negative timestamps are technically valid, they might introduce unnecessary complications for future users of the file. In most cases, negative timestamps may be indicative of an alignment error or a problem with the source data. As much as possible, re-align the session start time so that all timestamps are positive and correctly referenced to either ``timestamps_reference_time`` or ``session_start_time``.
 
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_timestamp_of_the_first_sample_is_not_negative`
+
+.. _best_practice_chunk_data:
+
 .. _best_practice_chunk_data:
 
 
