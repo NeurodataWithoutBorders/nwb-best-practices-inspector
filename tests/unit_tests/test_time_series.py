@@ -296,7 +296,7 @@ def test_check_timestamp_of_the_first_sample_is_not_negative_with_timestamps_pas
 
 
 def test_check_timestamp_of_the_first_sample_is_not_negative_with_starting_time_fail():
-    
+
     time_series = pynwb.TimeSeries(
         name="test_time_series", unit="test_units", data=[1, 2, 3], starting_time=-1.0, rate=30.0
     )
@@ -304,7 +304,7 @@ def test_check_timestamp_of_the_first_sample_is_not_negative_with_starting_time_
         "Timestamps should not be negative. This usually indicates a temporal misalignment of the data. "
         "It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
     )
-    
+
     assert check_timestamp_of_the_first_sample_is_not_negative(time_series) == InspectorMessage(
         message=message,
         importance=Importance.BEST_PRACTICE_SUGGESTION,
