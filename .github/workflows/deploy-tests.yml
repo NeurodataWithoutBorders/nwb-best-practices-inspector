@@ -3,13 +3,12 @@ name: Deploy tests
 on:
   pull_request:
 
-jobs:
-  cancel-previous-runs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+
+jobs:
   assess-file-changes:
     uses: catalystneuro/neuroconv/.github/workflows/assess-file-changes.yml@main
 
@@ -27,42 +26,48 @@ jobs:
           0
 
   run-doc-link-checks:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/doc-link-checks.yml@dev
+    uses: ./.github/workflows/doc-link-checks.yml
 
   run-tests:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/testing.yml@dev
+    uses: ./.github/workflows/testing.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   run-streaming-tests:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/streaming-tests.yml@dev
+    uses: ./.github/workflows/streaming-tests.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  run-past-gallery:
+  run-read-nwbfile-tests:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/version-gallery.yml@dev
+    uses: ./.github/workflows/read-nwbfile-tests.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   run-dev-gallery:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dev-gallery.yml@dev
+    uses: ./.github/workflows/dev-gallery.yml
 
   test-dandi-latest:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_release.yml@dev
+    uses: ./.github/workflows/dandi-release.yml
 
   test-dandi-dev:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev.yml@dev
+    uses: ./.github/workflows/dandi-dev.yml
 
   test-dandi-dev-live:
     needs: assess-file-changes
     if: ${{ needs.assess-file-changes.outputs.SOURCE_CHANGED == 'true' }}
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev_live_service.yml@dev
+    uses: ./.github/workflows/dandi-dev-live-services.yml
 
   check-final-status:
     name: All tests passing
@@ -74,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Decide whether the all jobs succeeded or at least one failed
+    - name: Decide whether all jobs succeeded or at least one failed
       uses: re-actors/alls-green@release/v1
       with:
         allowed-skips: run-tests  # Sometimes only docs are adjusted

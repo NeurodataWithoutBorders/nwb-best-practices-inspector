@@ -1,6 +1,9 @@
 name: Development Version Gallery
 on: workflow_call
 
+env:
+  TESTING_FILES_FOLDER_PATH: ./204919/testing_files/
+
 jobs:
   build-and-test:
     name: Testing against dev PyNWB version
@@ -8,31 +11,26 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: s-weigand/setup-conda@v1
-        with:
-          update-conda: true
-          python-version: 3.9
-          conda-channels: conda-forge
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch --prune --unshallow --tags
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
 
       - name: Install pytest
         run: |
           pip install pytest
           pip install pytest-cov
+
       - name: Install package
         run: |
-          pip install -e .
+          pip install -e ".[dandi]"
           pip install git+https://github.com/neurodatawithoutborders/pynwb@dev
-          pip install dandi
-      - name: Download testing data and set config path
-        run: |
-          dandi download "https://gui-staging.dandiarchive.org/#/dandiset/204919"
-          python -c "from nwbinspector.testing import update_testing_config; update_testing_config(key='LOCAL_PATH', value='./204919/testing_files/')"
-      - name: Uninstall h5py
-        run: pip uninstall -y h5py
-      - name: Install ROS3
-        run: conda install -c conda-forge h5py
 
-      - name: Run pytest with coverage
+      - name: Download testing data and set config path
+        run: dandi download "https://gui-staging.dandiarchive.org/#/dandiset/204919"
+
+      - name: Run pytest
         run: pytest -rsx

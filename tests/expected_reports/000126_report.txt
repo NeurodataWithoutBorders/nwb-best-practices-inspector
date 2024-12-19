@@ -1,0 +1,52 @@
+**************************************************
+NWBInspector Report Summary
+
+Timestamp: 2024-09-04 14:08:54.703671-04:00
+Platform: macOS-14.6.1-arm64-arm-64bit
+NWBInspector version: 0.4.38
+
+Found 10 issues over 1 files:
+       3 - CRITICAL
+       1 - BEST_PRACTICE_VIOLATION
+       6 - BEST_PRACTICE_SUGGESTION
+**************************************************
+
+
+0  CRITICAL
+===========
+
+0.0  sub-1/sub-1.nwb: check_subject_age - 'Subject' object at location '/general/subject'
+       Message: Subject is missing age and date_of_birth. Please specify at least one of these fields.
+
+0.1  sub-1/sub-1.nwb: check_subject_sex - 'Subject' object at location '/general/subject'
+       Message: Subject.sex is missing.
+
+0.2  sub-1/sub-1.nwb: check_subject_species_exists - 'Subject' object at location '/general/subject'
+       Message: Subject species is missing.
+
+1  BEST_PRACTICE_VIOLATION
+==========================
+
+1.3  sub-1/sub-1.nwb: check_regular_timestamps - 'TimeSeries' object at location '/acquisition/TestData'
+       Message: TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=0.1 and rate=10.0 instead of timestamps.
+
+2  BEST_PRACTICE_SUGGESTION
+===========================
+
+2.4  sub-1/sub-1.nwb: check_description - 'Subject' object at location '/general/subject'
+       Message: Description is missing.
+
+2.5  sub-1/sub-1.nwb: check_description - 'TimeSeries' object at location '/acquisition/TestData'
+       Message: Description ('no description') is a placeholder.
+
+2.6  sub-1/sub-1.nwb: check_experimenter_exists - 'NWBFile' object at location '/'
+       Message: Experimenter is missing.
+
+2.7  sub-1/sub-1.nwb: check_experiment_description - 'NWBFile' object at location '/'
+       Message: Experiment description is missing.
+
+2.8  sub-1/sub-1.nwb: check_institution - 'NWBFile' object at location '/'
+       Message: Metadata /general/institution is missing.
+
+2.9  sub-1/sub-1.nwb: check_keywords - 'NWBFile' object at location '/'
+       Message: Metadata /general/keywords is missing.

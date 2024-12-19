@@ -1,25 +1,20 @@
 import h5py
-import pynwb
-import pytest
 import numpy as np
-from packaging import version
+import pynwb
 
-
-from nwbinspector import (
-    InspectorMessage,
-    Importance,
-    check_regular_timestamps,
+from nwbinspector import Importance, InspectorMessage
+from nwbinspector.checks import (
     check_data_orientation,
-    check_timestamps_match_first_dimension,
-    check_timestamps_ascending,
     check_missing_unit,
+    check_rate_is_not_zero,
+    check_regular_timestamps,
     check_resolution,
     check_timestamp_of_the_first_sample_is_not_negative,
-    check_rate_is_not_zero,
+    check_timestamps_ascending,
+    check_timestamps_match_first_dimension,
+    check_timestamps_without_nans,
 )
-from nwbinspector.tools import make_minimal_nwbfile
-from nwbinspector.testing import check_streaming_tests_enabled
-from nwbinspector.utils import get_package_version, robust_s3_read
+from nwbinspector.testing import check_streaming_tests_enabled, make_minimal_nwbfile
 
 STREAMING_TESTS_ENABLED, DISABLED_STREAMING_TESTS_REASON = check_streaming_tests_enabled()
 
@@ -34,7 +29,7 @@ def test_check_regular_timestamps():
         )
     ) == InspectorMessage(
         message=(
-            "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 and rate=2.0 "
+            "TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 and rate=0.5 "
             "instead of timestamps."
         ),
         importance=Importance.BEST_PRACTICE_VIOLATION,
@@ -227,12 +222,52 @@ def test_pass_check_timestamps_ascending_pass():
     assert check_timestamps_ascending(time_series) is None
 
 
+def test_pass_check_timestamps_ascending_with_nans_pass():
+    time_series = pynwb.TimeSeries(
+        name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[1, np.nan, 3]
+    )
+    assert check_timestamps_ascending(time_series) is None
+
+
 def test_check_timestamps_ascending_fail():
     time_series = pynwb.TimeSeries(name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[1, 3, 2])
     assert check_timestamps_ascending(time_series) == InspectorMessage(
         message="test_time_series timestamps are not ascending.",
         importance=Importance.BEST_PRACTICE_VIOLATION,
         check_function_name="check_timestamps_ascending",
+        object_type="TimeSeries",
+        object_name="test_time_series",
+        location="/",
+    )
+
+
+def test_check_timestamps_ascending_with_nans_fail():
+    time_series = pynwb.TimeSeries(
+        name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[np.nan, 3, 2]
+    )
+    assert check_timestamps_ascending(time_series) == InspectorMessage(
+        message="test_time_series timestamps are not ascending.",
+        importance=Importance.BEST_PRACTICE_VIOLATION,
+        check_function_name="check_timestamps_ascending",
+        object_type="TimeSeries",
+        object_name="test_time_series",
+        location="/",
+    )
+
+
+def test_check_timestamps_without_nans_pass():
+    time_series = pynwb.TimeSeries(name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[1, 2, 3])
+    assert check_timestamps_without_nans(time_series) is None
+
+
+def test_check_timestamps_without_nans_fail():
+    time_series = pynwb.TimeSeries(
+        name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[np.nan, 2, 3]
+    )
+    assert check_timestamps_without_nans(time_series) == InspectorMessage(
+        message="test_time_series timestamps contain NaN values.",
+        importance=Importance.BEST_PRACTICE_VIOLATION,
+        check_function_name="check_timestamps_without_nans",
         object_type="TimeSeries",
         object_name="test_time_series",
         location="/",
@@ -312,32 +347,6 @@ def test_check_unknown_resolution_pass():
     for valid_unknown in [-1.0, np.nan]:
         time_series = pynwb.TimeSeries(name="test", unit="test", data=[1], timestamps=[1], resolution=valid_unknown)
         assert check_resolution(time_series) is None
-
-
-@pytest.mark.skipif(
-    not STREAMING_TESTS_ENABLED or get_package_version("hdmf") >= version.parse("3.3.1"),
-    reason=f"{DISABLED_STREAMING_TESTS_REASON or ''}. Also needs 'hdmf<3.3.1'.",
-)
-def test_check_none_matnwb_resolution_pass():
-    """
-    Special test on the original problematic file found at
-
-    https://dandiarchive.org/dandiset/000065/draft/files?location=sub-Kibbles%2F
-
-    produced with MatNWB, when read with PyNWB~=2.0.1 and HDMF<=3.2.1 contains a resolution value of None.
-    """
-    with pynwb.NWBHDF5IO(
-        path="https://dandiarchive.s3.amazonaws.com/blobs/da5/107/da510761-653e-4b81-a330-9cdae4838180",
-        mode="r",
-        load_namespaces=True,
-        driver="ros3",
-    ) as io:
-        nwbfile = robust_s3_read(command=io.read)
-        time_series = robust_s3_read(
-            command=nwbfile.processing["video_files"]["video"].time_series.get,
-            command_args=["20170203_KIB_01_s1.1.h264"],
-        )
-    assert check_resolution(time_series) is None
 
 
 def test_check_resolution_fail():

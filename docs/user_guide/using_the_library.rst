@@ -22,7 +22,7 @@ Inspect a single NWBFile
 ------------------------
 
 The most basic function to use when inspecting a single NWB file is the
-:py:class:`~nwbinspector.nwbinspector.inspect_nwb` function.
+:py:class:`~nwbinspector.nwbinspector.inspect_nwbfile` function.
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ function.
 
     all_results = list(inspect_all(path=file_paths_or_folder, ...))
 
-This has the same return structure as :py:class:`~nwbinspector.nwbinspector.inspect_nwb`.
+This has the same return structure as :py:class:`~nwbinspector.nwbinspector.inspect_nwbfile`.
 
 
 .. note::
@@ -76,35 +76,41 @@ This has the same return structure as :py:class:`~nwbinspector.nwbinspector.insp
 
 .. _simple_streaming_api:
 
-Inspect a DANDI set (ROS3)
---------------------------
+Inspect a Dandiset
+------------------
 
 It is a common use case to inspect and review entire datasets of NWB files that have already been uploaded to the
 :dandi-archive:`DANDI Archive <>`. While it is possible to simply download the entire dandiset to your local computer and
 run the NWB Inspector as usual, it can be more convenient to stream the data. This can be especially useful when the
 dandiset is large and impractical to download in full.
 
-Once you install the :ros3-tutorial:`ros3 driver <>`, you can inspect a dandiset by providing the six-digit identifier.
+Begin by installing the dependencies for streaming:
+
+.. code-block:: bash
+
+    pip install "nwbinspector[dandi]"
+
+Then, you can use the :py:meth:`~nwbinspector.inspect_dandiset` function to stream the data from the DANDI
 
 .. code-block:: python
 
-    from nwbinspector import inspect_all
+    from nwbinspector import inspect_dandiset
 
-    dandiset_id = "000004"  # for example
+    dandiset_id = "000004"
 
-    messages = list(inspect_all(nwbfile_path=dandiset_id, stream=True))
+    messages = list(inspect_dandiset(dandiset_id=dandiset_id))
 
 If there are multiple versions of the dandiset available (*e.g.*, separate 'draft' and 'published' versions) you can
-additionally specify this with the ``version_id`` argument.
+additionally specify this with the ``dandiset_version`` argument.
 
 .. code-block:: python
 
-    from nwbinspector import inspect_all
+    from nwbinspector import inspect_dandiset
 
-    dandiset_id = "000004"  # for example
-    version_id = "draft"  # or "published", or this can be the exact DOI value
+    dandiset_id = "000004"
+    dandiset_version = "0.220126.1851"
 
-    messages = list(inspect_all(nwbfile_path=dandiset_id, stream=True, version=version_id))
+    messages = list(inspect_dandiset(dandiset_id=dandiset_id, dandiset_version=dandiset_version))
 
 See the section on :ref:`advanced_streaming_api` for more customized usage of the streaming feature.
 

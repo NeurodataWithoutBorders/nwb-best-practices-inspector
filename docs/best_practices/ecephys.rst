@@ -1,4 +1,4 @@
-Extracallular electrophysiology
+Extracellular electrophysiology
 ===============================
 
 
@@ -58,6 +58,12 @@ For relative position of an electrode on a probe, use ``rel_x``, ``rel_y``, and 
 that are close enough to share a neuron.
 
 
+Avoid Duplication of Metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``ElectrodeTable`` should not contain redundant information that is present somewhere else within the :ref:`nwb-schema:sec-NWBFile` . Avoid adding columns to the `ElectrodeTable` that correspond to properties of the :ref:`nwb-schema:sec-ElectricalSeries` such as ``unit``, ``offsets`` or ``channel gains`` These properties should be stored in the corresponding attributes of the :ref:`nwb-schema:sec-ElectricalSeries` object.
+
+As a concrete example, the package objects from the `SpikeInterface <https://spikeinterface.readthedocs.io/en/latest/>`__ package contain two properties named ``gain_to_uv`` and ``offset_to_uv`` that are used to convert the raw data to microvolts. These properties should not be stored in the `ElectrodeTable` but rather in the ``ElectricalSeries`` object as ``channel_conversion`` and ``offset`` respectively.
 
 Units Table
 -----------
@@ -71,7 +77,7 @@ All spike times should be greater than zero. Being less than zero implies the sp
 should therefore be aligned to the ``timestamps_reference_time`` of the :ref:`nwb-schema:sec-NWBFile`) or the
 ``timestamps_reference_time`` itself is not set to the earliest recording time during the session.
 
-Check function: :py:meth:`~nwbinspector.checks.ecephys.check_negative_spike_times`
+Check function: :py:meth:`~nwbinspector.checks._ecephys.check_negative_spike_times`
 
 
 
@@ -82,4 +88,4 @@ Observation Intervals
 
 The ``obs_intervals`` field of the :ref:`nwb-schema:sec-units-src` table is used to indicate periods of time where the underlying electrical signal(s) were not observed. This can happen if the recording site moves away from the unit, or if the recording is stopped. Since the channel is not observed, it is not determinable whether a spike occurred during this time. Therefore, there should not be any identified spike times for units matched to those electrical signal(s) occurring outside of the defined ``obs_intervals``. If this variable is not set, it is assumed that all time is observed.
 
-Check function: :py:meth:`~nwbinspector.checks.ecephys.check_spike_times_not_in_unobserved_interval`
+Check function: :py:meth:`~nwbinspector.checks._ecephys.check_spike_times_not_in_unobserved_interval`

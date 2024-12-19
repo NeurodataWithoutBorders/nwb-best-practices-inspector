@@ -7,7 +7,7 @@ and its ecosystem of software tools.
 
 To enable NWB to accommodate the needs of the diverse neuroscience community, NWB provides a great degree of flexibility.
 In particular, the number of instances of a particular neurodata_type and corresponding names are often not fixed, to enable,
-e.g., storage of data from arbitrary numbers of devices withing the same file. While this flexibility is essential to enable
+e.g., storage of data from arbitrary numbers of devices within the same file. While this flexibility is essential to enable
 coverage of a broad range of use-cases, it can also lead to ambiguity. At the same time, we ultimately have the desire to have
 the schema as strict-as-possible to provide users and tool builders with a consistent organization of data. As such, we need to
 strike a fine balance between flexibility to enable support for varying experiments and use-cases and strictness in the schema
@@ -29,5 +29,6 @@ Authors: Oliver Ruebel, Andrew Tritt, Ryan Ly, Cody Baker and Ben Dichter
    ophys
    ogen
    image_series
+   images
    simulated_data
    extensions

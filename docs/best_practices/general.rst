@@ -42,7 +42,7 @@ Slash characters ``'/'`` and ``'\'``  should not be used in the ``name`` of an o
 
 For mathematical expressions, instead of including the special character in the name, please use an English equivalent instead. *E.g.*, instead of "Df/f" use "DfOverF".
 
-Check function: :py:meth:`~nwbinspector.checks.general.check_name_slashes`
+Check function: :py:meth:`~nwbinspector.checks._general.check_name_slashes`
 
 
 
@@ -55,7 +55,7 @@ The :py:attr:`name` of an object is for identifying that object within the file;
 
 It is acceptable to name an object something like ``ElectricalSeriesFromProbe1`` as per the uniqueness requirement of :ref:`best_practice_object_names`, however the name alone is not sufficient documentation of the signal source. In this case, the source of the signal will be clear from the :ref:`nwb-schema:devices` linkage in the rows of the passed :ref:`hdmf-schema:sec-dynamictableregion` subsetting the full ``ElectrodeTable``, so you would not need to add any explicit metadata explaining these details.
 
-Check function: :py:meth:`~nwbinspector.checks.general.check_description`
+Check function: :py:meth:`~nwbinspector.checks._general.check_description`
 
 
 
@@ -68,3 +68,9 @@ Empty Strings
 Required free-text fields for neurodata types should not use placeholders such as empty strings (`""`), ``"no description"``, or ``"PLACEHOLDER"``. For example, the :py:attr:`description` field should always richly describe that particular neurodata type and its interpretation within the experiment.
 
 Many attributes of neurodata types in NWB are optional details to include. It is not necessary, therefore, to use placeholders for these attributes. Instead, they should not be specified at all.
+
+
+Avoid Duplication of Metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Avoid duplication of metadata across different objects. If a piece of metadata is shared between multiple objects, consider creating a separate object to store that metadata and linking to it from the other objects. This will help to keep the metadata consistent and reduce the risk of errors when updating the metadata.

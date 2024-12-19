@@ -1,5 +1,9 @@
 name: Streaming tests
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
   build-and-test:
@@ -8,32 +12,68 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.8", "3.11"]
+        os: ["ubuntu-latest", "windows-latest"]  # TODO: update mac and streaming methods
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
-      - uses: s-weigand/setup-conda@v1
-        with:
-          update-conda: true
-          python-version: ${{ matrix.python-version }}
-          conda-channels: conda-forge
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch --prune --unshallow --tags
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pytest
+        run: |
+          pip install pytest
+          pip install pytest-cov
+
+      - name: Install package
+        run: pip install ".[dandi]"
+
+      - name: Run pytest on stream tests with coverage
+        run: |
+          pytest -rsx --cov=nwbinspector --cov-report xml:./api_coverage.xml tests/streaming_tests.py
+          pytest -rsx --cov=nwbinspector --cov-report xml:./cli_coverage.xml tests/streaming_cli_tests.py
+
+      - if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
+        name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          file: ./api_coverage.xml
+
+      - if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
+        name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          file: ./cli_coverage.xml
+
+  build-and-test-no-dandi:
+    name: Testing using ${{ matrix.os }} with ${{ matrix.python-version }} without dandi dependencies
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --prune --unshallow --tags
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install pytest
         run: pip install pytest
 
       - name: Install package
-        run: |
-          pip install -e .
-          pip install dandi
-      - name: Install HDMF-zarr # temporary
-        run: pip install hdmf-zarr
-      - name: Install latest HDMF # temporary
-        run: pip install -U hdmf
-      - name: Uninstall h5py
-        run: pip uninstall -y h5py
-      - name: Install ROS3
-        run: conda install -c conda-forge h5py
+        run: pip install .
 
-      - name: Run pytest on stream tests
-        run: pytest tests/ -rsx tests/streaming_tests.py
+      - name: Run pytest with coverage
+        run: pytest -rsx

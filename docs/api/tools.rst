@@ -1,5 +1,5 @@
-Tools for Organizating and Displaying Reports
-=============================================
+Tools for Organizing and Displaying Reports
+===========================================
 
 .. automodule:: nwbinspector
     :members:
@@ -9,5 +9,8 @@ Tools for Organizating and Displaying Reports
 .. toctree::
     :maxdepth: 4
 
-.. automodule:: nwbinspector.inspector_tools
+.. automodule:: nwbinspector._organization
+    :noindex:
+
+.. automodule:: nwbinspector._formatting
     :noindex:

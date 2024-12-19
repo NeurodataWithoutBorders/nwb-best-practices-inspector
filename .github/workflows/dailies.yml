@@ -9,23 +9,25 @@ jobs:
 
   run-daily-tests:
     uses: neurodatawithoutborders/nwbinspector/.github/workflows/testing.yml@dev
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   run-daily-doc-link-checks:
     uses: neurodatawithoutborders/nwbinspector/.github/workflows/doc-link-checks.yml@dev
 
   test-dandi-latest:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_release.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-release.yml@dev
 
   test-dandi-dev:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-dev.yml@dev
 
   test-dandi-dev-live:
-    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi_dev_live_service.yml@dev
+    uses: neurodatawithoutborders/nwbinspector/.github/workflows/dandi-dev-live-services.yml@dev
 
   notify:
     runs-on: ubuntu-latest
-    needs: [run-daily-tests, run-daily-doc-link-checks]
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    needs: [run-daily-tests, run-daily-doc-link-checks, test-dandi-latest, test-dandi-dev, test-dandi-dev-live]
+    if: failure()
     steps:
     - uses: dawidd6/action-send-mail@v3
       with:
@@ -34,6 +36,6 @@ jobs:
         username: ${{ secrets.MAIL_USERNAME }}
         password: ${{ secrets.MAIL_PASSWORD }}
         subject: NWB Inspector Daily Failure
-        to: ${{ secrets.DAILY_FAILURE_EMAIL_LIST }}  # add more with commas, no separation
+        to: smprince@lbl.gov, rly@lbl.gov
         from: NWB Inspector
         body: "The daily workflow for the NWB Inspector failed: please check status at https://github.com/NeurodataWithoutBorders/nwbinspector/actions/workflows/dailies.yml"

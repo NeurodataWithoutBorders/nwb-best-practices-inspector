@@ -1,13 +1,12 @@
-import numpy as np
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
+import numpy as np
 import pynwb
 from hdmf.testing import TestCase
 
+from nwbinspector import Importance, InspectorMessage, Severity, organize_messages
 from nwbinspector.tools import all_of_type
-from nwbinspector.inspector_tools import organize_messages
-from nwbinspector.register_checks import InspectorMessage, Importance, Severity
 
 
 def test_all_of_type():

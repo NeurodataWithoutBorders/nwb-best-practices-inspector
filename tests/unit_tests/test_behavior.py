@@ -1,11 +1,11 @@
-from pynwb.behavior import SpatialSeries, CompassDirection
 import numpy as np
+from pynwb.behavior import CompassDirection, SpatialSeries
 
-from nwbinspector import InspectorMessage, Importance
-from nwbinspector.checks.behavior import (
+from nwbinspector import Importance, InspectorMessage
+from nwbinspector.checks import (
     check_compass_direction_unit,
-    check_spatial_series_dims,
     check_spatial_series_degrees_magnitude,
+    check_spatial_series_dims,
     check_spatial_series_radians_magnitude,
 )
 
@@ -64,8 +64,8 @@ def test_trigger_check_compass_direction_unit():
     )
 
     assert (
-        check_compass_direction_unit(obj)[0].message == f"SpatialSeries objects inside a CompassDirection object "
-        f"should be angular and should have a unit of 'degrees' or 'radians', but 'SpatialSeries' has units 'meters'."
+        check_compass_direction_unit(obj)[0].message == "SpatialSeries objects inside a CompassDirection object "
+        "should be angular and should have a unit of 'degrees' or 'radians', but 'SpatialSeries' has units 'meters'."
     )
 
 

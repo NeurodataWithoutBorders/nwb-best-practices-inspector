@@ -1,16 +1,19 @@
 import os
-from packaging import version
 
+import numpy as np
+import pytest
 from hdmf.testing import TestCase
+from packaging import version
 
 from nwbinspector import Importance
 from nwbinspector.utils import (
-    format_byte_size,
-    is_regular_series,
-    is_dict_in_string,
-    get_package_version,
     calculate_number_of_cpu,
+    format_byte_size,
+    get_package_version,
     is_ascending_series,
+    is_dict_in_string,
+    is_regular_series,
+    strtobool,
 )
 
 
@@ -141,4 +144,23 @@ class TestCalulcateNumberOfCPU(TestCase):
 def test_is_ascending_series():
     assert is_ascending_series(series=[1, 1, 1])
     assert is_ascending_series(series=[1, 2, 3])
+    assert is_ascending_series(series=[1, np.nan, 3])
     assert not is_ascending_series(series=[1, 2, 1])
+
+
+@pytest.mark.parametrize(
+    "values,target",
+    [
+        (("y", "yes", "t", "true", "on", "1"), True),
+        (("n", "no", "f", "false", "off", "0"), False),
+    ],
+)
+def test_strtobool(values, target):
+    for v in values:
+        assert strtobool(v) is target
+        assert strtobool(v.upper()) is target
+        with pytest.raises(ValueError):
+            strtobool(v + "1")
+    # it is strtobool, so no bool is allowed
+    with pytest.raises(TypeError):
+        strtobool(target)

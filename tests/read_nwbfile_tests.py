@@ -5,15 +5,15 @@ from pathlib import Path
 import pytest
 from hdmf_zarr import NWBZarrIO
 from pynwb import NWBHDF5IO
-from pynwb.testing.mock.file import mock_NWBFile
 from pynwb.testing.mock.base import mock_TimeSeries
+from pynwb.testing.mock.file import mock_NWBFile
 
-from nwbinspector.tools import read_nwbfile
 from nwbinspector.testing import (
-    check_streaming_tests_enabled,
     check_hdf5_io_open,
+    check_streaming_tests_enabled,
     check_zarr_io_open,
 )
+from nwbinspector.tools import read_nwbfile
 
 STREAMING_TESTS_ENABLED, DISABLED_STREAMING_TESTS_REASON = check_streaming_tests_enabled()
 

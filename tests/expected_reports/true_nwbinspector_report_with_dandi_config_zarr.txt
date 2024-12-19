@@ -1,0 +1,45 @@
+**************************************************
+NWBInspector Report Summary
+
+Timestamp: 2022-04-01 13:32:13.756390-04:00
+Platform: Windows-10-10.0.19043-SP0
+NWBInspector version: 0.3.6
+
+Found 10 issues over 2 files:
+       3 - CRITICAL
+       7 - BEST_PRACTICE_VIOLATION
+**************************************************
+
+
+0  CRITICAL
+===========
+
+0.0  ./testing0.nwb.zarr and 1 other file: check_subject_exists - 'NWBFile' object at location '/'
+       Message: Subject is missing.
+
+0.1  ./testing0.nwb.zarr: check_timestamps_match_first_dimension - 'TimeSeries' object at location '/acquisition/test_time_series_3'
+       Message: The length of the first dimension of data (4) does not match the length of timestamps (3).
+
+1  BEST_PRACTICE_VIOLATION
+==========================
+
+1.2  ./testing0.nwb.zarr: check_time_interval_time_columns - 'TimeIntervals' object with name 'test_table'
+       Message: ['start_time'] are time columns but the values are not in ascending order. All times should be in seconds with respect to the session start time.
+
+1.3  ./testing0.nwb.zarr: check_regular_timestamps - 'TimeSeries' object at location '/acquisition/test_time_series_2'
+       Message: TimeSeries appears to have a constant sampling rate. Consider specifying starting_time=1.2 and rate=0.5 instead of timestamps.
+
+1.4  ./testing0.nwb.zarr: check_data_orientation - 'SpatialSeries' object at location '/processing/behavior/Position/my_spatial_series'
+       Message: Data may be in the wrong orientation. Time should be in the first dimension, and is usually the longest dimension. Here, another dimension is longer.
+
+1.5  ./testing0.nwb.zarr: check_missing_unit - 'TimeSeries' object at location '/acquisition/test_time_series_3'
+       Message: Missing text for attribute 'unit'. Please specify the scientific unit of the 'data'.
+
+1.6  ./testing0.nwb.zarr: check_missing_unit - 'TimeSeries' object at location '/acquisition/test_time_series_2'
+       Message: Missing text for attribute 'unit'. Please specify the scientific unit of the 'data'.
+
+1.7  ./testing0.nwb.zarr: check_missing_unit - 'TimeSeries' object at location '/acquisition/test_time_series_1'
+       Message: Missing text for attribute 'unit'. Please specify the scientific unit of the 'data'.
+
+1.8  ./testing1.nwb.zarr: check_data_orientation - 'TimeSeries' object at location '/acquisition/my_spatial_series'
+       Message: Data may be in the wrong orientation. Time should be in the first dimension, and is usually the longest dimension. Here, another dimension is longer.

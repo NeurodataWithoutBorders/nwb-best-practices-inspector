@@ -1,5 +1,110 @@
 # Upcoming
 
+
+# v0.6.1
+
+### Improvements
+* Added support for Numpy 2 and h5py 3.12, and pinned PyNWB to <3.0 temporarily. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
+
+### Fixes
+* Fixed issue where the description check failed if the description was a list. [#535](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/535)
+
+
+# v0.6.0
+
+### Deprecation
+* Support for Python 3.8 has been removed. [#508](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/508)
+
+### Deprecation (API)
+* The `inspect_nwb` method has been removed. Please use `inspect_nwbfile` or `inspect_nwbfile_object` instead. [#505](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/505)
+
+### New Features
+* Added Zarr support. [#513](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/513)
+
+### Improvements
+* Removed the `robust_ros3_read` utility helper. [#506](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/506)
+* Simplified the `nwbinspector.testing` configuration framework. [#509](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/509)
+* Cleaned old references to non-recent PyNWB and HDMF versions. Current policy is that latest NWB Inspector releases should only support compatibility with latest PyNWB and HDMF. [#510](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/510)
+* Swapped setup approach to the modern `pyproject.toml` standard. [#507](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/507)
+* Added complete annotation typing and integrated Mypy into pre-commit. [#520](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/520)
+
+### Fixes
+* Fixed incorrect error message for OptogeneticStimulusSite. [#524](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/524)
+* Fixed detection of Zarr directories for inspection. [#531](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/531)
+
+
+# v0.5.2
+
+### Deprecation (API)
+* The `driver` argument has been removed from `inspect_nwbfile`. Please use `nwbinspector.inspect_dandiset` or `nwbinspector.inspect_dandi_file_path` instead. [#490](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/490)
+
+### Pending Deprecation (API)
+* The `stream` and `version_id` arguments have been removed from `nwbinspector.inspect_all`. Please use `nwbinspector.inspect_dandiset` instead. [#490](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/490)
+
+### New Features
+* Introduced the `inspect_dandiset` and `inspect_dandi_file_path` API functions to replace the functionality in `nwbinspector --stream`. The new feature uses `remfile` instead of `ros3`. [#490](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/490)
+
+### Fixes
+* Fixed import error when using the CLI with `--config dandi`. [#494](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/494)
+* Removed unused imports throughout package. [#496](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/496)
+
+
+
+# v0.5.0
+
+### Deprecation (API)
+* Certain low-level functions have been marked as private (such as the former `nwbinspector.register_checks.auto_parse`) indicating they should not have been imported by downstream users. [#485](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/485)
+* Various inappropriate imports from certain submodules have been hard deprecated (e.g., `from nwbinspector.inspector_tools import natsorted`). [#485](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/485)
+
+### Pending Deprecation (API)
+* The `inspector_tools`, `register_check`, and `` submodules have been soft deprecated and will be removed in the next major release. [#485](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/485)
+
+### Improvements
+* Update util function `is_ascending_series` to discard nan values and add `check_timestamps_without_nans` fun to check if timestamps contain NaN values [#476](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/476)
+* Updated the import structure to match modern Python packaging standards. [#485](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/485)
+
+
+
+# v0.4.37
+
+### Fixes
+
+* Equivocated timezone handling to target fields when checking for past and future dates. [#471](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/471)
+
+
+
+# v0.4.36
+
+### Fixes
+
+* Fixed the suggested rate in `check_regular_timestamps` to be in Hz. [#467](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/467)
+* Added a skip for mac sidecar files (._*). [#470](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/470)
+
+
+
+# v0.4.35
+
+### Fixes
+
+* Extended `check_session_start_time_future_date` and `check_session_start_time_old_date` to be timezone optional as allowed by PyNWB > 2.6.0 versions. [#452](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/452)
+
+### Improvements
+
+* Exposed progress bar control to `inspect_all` and `run_checks` to allow compatibility with more generic visualizations of inspection progress related to the NWB GUIDED. [#443](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/443)
+* Added Python 3.12 support. [#457](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/457)
+
+### Testing
+
+* Pinned action runners to MacOS x64 architecture; removed other deprecated steps of setup and continuous integration testing. [#450](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/450)
+
+
+
+# v0.4.34
+
+### Fixes
+
+* Fixed `--modules` flag in `nwbinspector` command line interface to allow for import of additional modules in the command line. This was necessary to be able to register new customized checks to the NWB Inspector. [#446](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/446)
+
 # v0.4.33
 
 ### Fixes
@@ -185,7 +290,7 @@
 # v0.4.14
 
 ### Fixes
-* Fixed an error with attribute retrieval specific to the `cell_id` of the `IntracellularElectrode` neurodata type that occured with respect to older versions of PyNWB. [PR #264](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/264)
+* Fixed an error with attribute retrieval specific to the `cell_id` of the `IntracellularElectrode` neurodata type that occurred with respect to older versions of PyNWB. [PR #264](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/264)
 
 
 

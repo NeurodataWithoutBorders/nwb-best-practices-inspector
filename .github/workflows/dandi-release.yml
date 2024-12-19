@@ -1,0 +1,51 @@
+name: Run NWB Inspector tests against latest DANDI release - no network
+on: workflow_call
+
+env:
+  DANDI_TESTS_NONETWORK: "1"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    env:
+      NO_ET: 1
+      DANDI_ALLOW_LOCALHOST_URLS: "1"
+      DANDI_PAGINATION_DISABLE_FALLBACK: "1"
+      DANDI_TESTS_PERSIST_DOCKER_COMPOSE: "1"
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        python:
+          - '3.11'
+
+    steps:
+    - name: Checkout local branch of source repository
+      uses: actions/checkout@v4
+      with:
+        # Fetch all commits so that versioneer will return something compatible
+        # with semantic-version
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install latest DANDI release
+      run: |
+        python -m pip install --upgrade pip wheel
+        pip install "dandi[extras,test]"
+
+    - name: Install this branch of NWB Inspector
+      run: |
+        pip install -e .
+        pip install hdmf==3.14.3  # temporary: https://github.com/dandi/dandi-cli/issues/1494
+
+    - name: Run all NWB Inspector tests
+      run: pytest -rsx

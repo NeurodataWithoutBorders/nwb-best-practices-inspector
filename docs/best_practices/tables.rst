@@ -12,7 +12,7 @@ Table Values
 
 String-valued table entries should not contain :wikipedia:`JSON <JSON>`. Instead, these values should be unpacked and used as additional columns of that table.
 
-Check function: :py:meth:`~nwbinspector.checks.tables.check_table_values_for_dict`
+Check function: :py:meth:`~nwbinspector.checks._tables.check_table_values_for_dict`
 
 
 
@@ -32,7 +32,7 @@ Tables With Only a Single Row
 
 It is not common to save a table with only a single row entry. Consider other ``neurodata_types``, such as a one-dimensional :ref:`nwb-schema:sec-TimeSeries`.
 
-Check function: :py:meth:`~nwbinspector.checks.tables.check_single_row`
+Check function: :py:meth:`~nwbinspector.checks._tables.check_single_row`
 
 
 
@@ -44,7 +44,7 @@ Tables With an Entire Column as ``NaN``
 If an entire column of a :ref:`hdmf-schema:sec-dynamictable` would be filled with ``NaN`` values, then it should not be written.
 
 
-Check function: :py:meth:`~nwbinspector.checks.tables.check_col_not_nan`
+Check function: :py:meth:`~nwbinspector.checks._tables.check_col_not_nan`
 
 
 
@@ -56,7 +56,7 @@ Table Region Data
 Store data with long columns rather than long rows. When constructing dynamic tables, keep in mind that the data is
 stored by column, so it will be less efficient to store data in a table that has many more columns than rows.
 
-Check function :py:meth:`~nwbinspector.checks.tables.check_dynamic_table_region_data_validity`
+Check function :py:meth:`~nwbinspector.checks._tables.check_dynamic_table_region_data_validity`
 
 
 

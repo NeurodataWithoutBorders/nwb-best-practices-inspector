@@ -3,17 +3,16 @@ from unittest import TestCase
 from uuid import uuid4
 
 import numpy as np
+from hdmf.common.table import DynamicTable, DynamicTableRegion
 from pynwb import NWBFile
 from pynwb.ecephys import ElectricalSeries
 from pynwb.misc import Units
-from hdmf.common.table import DynamicTableRegion, DynamicTable
 
-from nwbinspector import (
-    InspectorMessage,
-    Importance,
-    check_negative_spike_times,
+from nwbinspector import Importance, InspectorMessage
+from nwbinspector.checks import (
     check_electrical_series_dims,
     check_electrical_series_reference_electrodes_table,
+    check_negative_spike_times,
     check_spike_times_not_in_unobserved_interval,
 )
 

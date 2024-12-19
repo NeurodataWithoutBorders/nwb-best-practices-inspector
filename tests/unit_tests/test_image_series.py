@@ -1,41 +1,38 @@
+import os
 import unittest
 from pathlib import Path
-from tempfile import mkdtemp
 from shutil import rmtree
+from tempfile import mkdtemp
 
 import numpy as np
 from pynwb import NWBHDF5IO, H5DataIO
 from pynwb.image import ImageSeries
 
-from nwbinspector import (
-    InspectorMessage,
-    Importance,
-    check_image_series_external_file_valid,
-    check_image_series_external_file_relative,
+from nwbinspector import Importance, InspectorMessage
+from nwbinspector.checks import (
     check_image_series_data_size,
+    check_image_series_external_file_relative,
+    check_image_series_external_file_valid,
     check_timestamps_match_first_dimension,
 )
-from nwbinspector.tools import make_minimal_nwbfile
-from nwbinspector.testing import load_testing_config
+from nwbinspector.testing import make_minimal_nwbfile
 
-try:
-    testing_config = load_testing_config()
-    testing_file = Path(testing_config["LOCAL_PATH"]) / "image_series_testing_file.nwb"
-    NO_CONFIG = False  # Depending on the method of installation, a config may not have generated
-except FileNotFoundError:
-    testing_file = "Not found"
-    NO_CONFIG = True
+TESTING_FILES_FOLDER_PATH = os.environ.get("TESTING_FILES_FOLDER_PATH", None)
 
 
 @unittest.skipIf(
-    NO_CONFIG or not testing_file.exists(),
-    reason=f"The ImageSeries unit tests were skipped because the required file ({testing_file}) was not found!",
+    TESTING_FILES_FOLDER_PATH is None,
+    reason=(
+        "These ImageSeries unit tests were skipped because the environment variable "
+        "'TESTING_FILES_FOLDER_PATH' was not set!"
+    ),
 )
 class TestExternalFileValid(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        testing_config = load_testing_config()
-        cls.testing_file = Path(testing_config["LOCAL_PATH"]) / "image_series_testing_file.nwb"
+        cls.testing_file = Path(TESTING_FILES_FOLDER_PATH) / "image_series_testing_file.nwb"
+
+        assert cls.testing_file.exists()
 
     def setUp(self):
         self.io = NWBHDF5IO(path=self.testing_file, mode="r")

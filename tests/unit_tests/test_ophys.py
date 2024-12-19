@@ -3,27 +3,26 @@ from unittest import TestCase
 from uuid import uuid4
 
 import numpy as np
+from hdmf.common.table import DynamicTable, DynamicTableRegion
 from pynwb import NWBFile
 from pynwb.device import Device
 from pynwb.ophys import (
-    OpticalChannel,
     ImageSegmentation,
-    RoiResponseSeries,
     ImagingPlane,
+    OpticalChannel,
     PlaneSegmentation,
+    RoiResponseSeries,
     TwoPhotonSeries,
 )
-from hdmf.common.table import DynamicTableRegion, DynamicTable
 
-from nwbinspector import (
-    InspectorMessage,
-    Importance,
+from nwbinspector import Importance, InspectorMessage
+from nwbinspector.checks import (
+    check_emission_lambda_in_nm,
+    check_excitation_lambda_in_nm,
+    check_image_series_data_size,  # Technically an ImageSeries check, but test is more convenient here
+    check_plane_segmentation_image_mask_shape_against_ref_images,
     check_roi_response_series_dims,
     check_roi_response_series_link_to_plane_segmentation,
-    check_excitation_lambda_in_nm,
-    check_emission_lambda_in_nm,
-    check_plane_segmentation_image_mask_shape_against_ref_images,
-    check_image_series_data_size,  # Technically an ImageSeries check, but test is more convenient here
 )
 
 

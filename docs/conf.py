@@ -1,14 +1,17 @@
+import os
 import sys
 from pathlib import Path
 
+from nwbinspector import available_checks
+from collections import defaultdict
+
 sys.path.append(str(Path(__file__).parent))
 from conf_extlinks import extlinks, intersphinx_mapping
-from gen_checks_by_importance import gen_checks_by_importance
 
-sys.path.insert(0, Path(__file__).resolve().parents[1])
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 project = "NWBInspector"
-copyright = "2022, CatalystNeuro"
+copyright = "2022-2024, CatalystNeuro"
 author = "Cody Baker, Ryan Ly, and Ben Dichter"
 
 extensions = [
@@ -73,4 +76,35 @@ def setup(app):
     app.connect("autodoc-process-docstring", add_refs_to_docstrings)
 
 
-gen_checks_by_importance()
+def _gen_checks_by_importance():
+    dd = defaultdict(list)
+
+    for x in available_checks:
+        dd[x.importance.name.replace("_", " ")].append(x)
+
+    generate_checks_rst_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "checks_by_importance.rst")
+    with open(generate_checks_rst_file, "w") as f:
+        f.write(
+            """Checks by Importance
+======================
+
+This section lists the available checks organized by their importance level.
+
+"""
+        )
+
+        for importance_level, checks in dd.items():
+            f.write(
+                f"""{importance_level}
+{'-' * (len(f'{importance_level}') + 1)}
+
+"""
+            )
+
+            for check in checks:
+                f.write(f"*  :py:func:`~{check.__module__}.{check.__name__}`\n")
+
+            f.write("\n")
+
+
+_gen_checks_by_importance()
