@@ -132,7 +132,7 @@ def check_timestamp_of_the_first_sample_is_not_negative(time_series: TimeSeries)
     if first_timestamp < 0:
         message = (
             "Timestamps should not be negative. This usually indicates a temporal misalignment of the data. "
-            " It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
+            "It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."
         )
         return InspectorMessage(message=message)
 
