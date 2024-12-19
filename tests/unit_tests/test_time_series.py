@@ -242,9 +242,8 @@ def test_check_timestamps_ascending_fail():
 def test_check_timestamp_of_the_first_sample_is_not_negative_with_timestamps_fail():
     time_series = pynwb.TimeSeries(name="test_time_series", unit="test_units", data=[1, 2, 3], timestamps=[-1, 0, 1])
     message = (
-        "Timestamps should not be negative."
-        " It is recommended to align the `session_start_time` or `timestamps_reference_time` "
-        "to be the earliest time value that occurs in the data, and shift all other signals accordingly."
+        "Timestamps should not be negative. This usually indicates a temporal misalignment of the data. "
+        " It is recommended to align the `session_start_time` or `timestamps_reference_time` to be the earliest time value that occurs in the data, and shift all other signals accordingly."            
     )
     assert check_timestamp_of_the_first_sample_is_not_negative(time_series) == InspectorMessage(
         message=message,
