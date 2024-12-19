@@ -32,7 +32,6 @@ best guess. If the exact start time is unknown, then it is fine to simply set it
 
 Check functions: :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_session_start_time_old_date`,
 :py:meth:`~nwbinspector.checks._nwbfile_metadata.check_session_start_time_future_date`,
-:py:meth:`~nwbinspector.checks._time_series.check_timestamp_of_the_first_sample_is_not_negative`
 :py:meth:`~nwbinspector.checks._tables.check_table_time_columns_are_not_negative`
 
 

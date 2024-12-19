@@ -123,6 +123,21 @@ For segmented data, refer to the section covering :ref:`best_practice_timestamps
 Check function: :py:meth:`~nwbinspector.checks._time_series.check_regular_timestamps`
 
 
+.. _best_practice_avoid_negative_timestamps:
+
+Avoid Negative Timestamps
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When writing :ref:`nwb-schema:sec-TimeSeries` data, avoid using negative timestamps.
+
+All timestamps in the NWBFile are written with respect to a global reference point (either ``timestamps_reference_time`` or ``session_start_time``).
+
+While negative timestamps are technically valid, they might introduce unnecessary complications for future users of the file.
+In most cases, negative timestamps may be indicative of an alignment error or a problem with the source data.
+As much as possible, re-align the session start time so that all timestamps are positive and correctly referenced to either ``timestamps_reference_time`` or ``session_start_time``.
+See :ref:`best_practice_global_time_reference` for more details.
+
+Check function: :py:meth:`~nwbinspector.checks._time_series.check_timestamp_of_the_first_sample_is_not_negative`
 
 .. _best_practice_chunk_data:
 

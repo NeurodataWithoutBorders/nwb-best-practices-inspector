@@ -1,6 +1,9 @@
 # Upcoming
 
 
+## Improvements
+* Added a section for describing the issues with negative timestamps in `TimeSeries` [#545](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/545)
+
 # v0.6.1
 
 ### Improvements
@@ -8,7 +11,6 @@
 
 ### Fixes
 * Fixed issue where the description check failed if the description was a list. [#535](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/535)
-
 
 # v0.6.0
 
