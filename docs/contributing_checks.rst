@@ -9,8 +9,8 @@ Overview
 NWBInspector checks are Python functions that examine NWB files for compliance with best practices. Each check is:
 
 1. Focused on a specific aspect of NWB files
-2. Decorated with ``@register_check``
-3. Returns either ``None`` (pass) or an ``InspectorMessage`` (fail)
+2. Decorated with :py:func:`~nwbinspector._registration.register_check`
+3. Returns either ``None`` (pass) or :py:class:`~nwbinspector._types.InspectorMessage` (fail)
 
 Step-by-Step Guide
 ------------------
@@ -20,9 +20,9 @@ Step-by-Step Guide
 
 Before writing code:
 
-1. Open a `'New Check' issue <https://github.com/NeurodataWithoutBorders/nwbinspector/issues/new/choose>`_
+1. Open a :nwbinspector-issues:`'New Check' issue <>`
 2. Describe what the check will validate
-3. Link to relevant best practices documentation
+3. Link to relevant :doc:`best practices documentation <best_practices/best_practices_index>`
 4. Wait for approval before proceeding
 
 2. Choose the Right Location
@@ -30,16 +30,16 @@ Before writing code:
 
 Checks are organized by category in ``src/nwbinspector/checks/``. Choose the appropriate file based on what you're checking:
 
-- ``_nwbfile_metadata.py`` - General NWBFile metadata
-- ``_nwb_containers.py`` - NWB container objects
-- ``_time_series.py`` - TimeSeries objects
-- ``_tables.py`` - Table objects
-- ``_behavior.py`` - Behavioral data
-- ``_icephys.py`` - Intracellular electrophysiology
-- ``_ecephys.py`` - Extracellular electrophysiology
-- ``_ophys.py`` - Optical physiology
-- ``_ogen.py`` - Optogenetics
-- ``_image_series.py`` - ImageSeries objects
+1. ``_nwbfile_metadata.py`` - General :py:class:`~pynwb.file.NWBFile` metadata
+2. ``_nwb_containers.py`` - NWB container objects
+3. ``_time_series.py`` - :py:class:`~pynwb.base.TimeSeries` objects
+4. ``_tables.py`` - :py:class:`~hdmf.common.table.DynamicTable` objects
+5. ``_behavior.py`` - Behavioral data
+6. ``_icephys.py`` - Intracellular electrophysiology
+7. ``_ecephys.py`` - Extracellular electrophysiology
+8. ``_ophys.py`` - Optical physiology
+9. ``_ogen.py`` - Optogenetics
+10. ``_image_series.py`` - :py:class:`~pynwb.image.ImageSeries` objects
 
 3. Write Your Check
 ^^^^^^^^^^^^^^^^^^^
@@ -63,11 +63,11 @@ Here's a template for a new check:
 4. Choose the Right Importance Level
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Select from three levels:
+Select from three levels (see :doc:`checks_by_importance` for examples):
 
-- ``Importance.CRITICAL``: High likelihood of incorrect data that can't be caught by PyNWB validation
-- ``Importance.BEST_PRACTICE_VIOLATION``: Major violation of `Best Practices <https://www.nwb.org/best-practices/>`_
-- ``Importance.BEST_PRACTICE_SUGGESTION``: Minor violation or missing optional metadata
+1. ``Importance.CRITICAL``: High likelihood of incorrect data that can't be caught by PyNWB validation
+2. ``Importance.BEST_PRACTICE_VIOLATION``: Major violation of :nwb-overview:`Best Practices <best_practices/best_practices_index.html>`
+3. ``Importance.BEST_PRACTICE_SUGGESTION``: Minor violation or missing optional metadata
 
 5. Write Tests
 ^^^^^^^^^^^^^^
@@ -92,7 +92,7 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
 1. Keep logic simple and focused
 2. Use descriptive variable names
 3. Add comments for complex logic
-4. Reuse utility functions from ``utils.py`` when possible
+4. Reuse utility functions from :doc:`api/utils` when possible
 5. Make error messages clear and actionable
 6. Include links to relevant documentation in docstrings
 
@@ -124,6 +124,8 @@ Here's a complete example of a well-implemented check:
             )
         return None
 
+For more examples, see the :doc:`api/checks` documentation.
+
 Common Pitfalls
 ---------------
 
@@ -136,6 +138,6 @@ Common Pitfalls
 Need Help?
 ----------
 
-- Review existing checks for examples
-- Ask questions in your issue before starting implementation
-- Request review from maintainers early in the process
+1. Review existing :doc:`api/checks` for examples
+2. Ask questions in your :nwbinspector-issues:`issue <>` before starting implementation
+3. Request review from maintainers early in the process
