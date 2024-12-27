@@ -138,4 +138,4 @@ Need Help?
 
 - Review existing checks for examples
 - Ask questions in your issue before starting implementation
-- Request review from maintainers early in the process 
+- Request review from maintainers early in the process
