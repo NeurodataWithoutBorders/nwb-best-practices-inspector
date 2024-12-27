@@ -1,5 +1,5 @@
 Contributing New Checks
-=====================
+=======================
 
 This guide will walk you through the process of contributing a new check to NWBInspector.
 
@@ -13,10 +13,10 @@ NWBInspector checks are Python functions that examine NWB files for compliance w
 3. Returns either ``None`` (pass) or an ``InspectorMessage`` (fail)
 
 Step-by-Step Guide
------------------
+------------------
 
 1. Propose Your Check
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 Before writing code:
 
@@ -26,7 +26,7 @@ Before writing code:
 4. Wait for approval before proceeding
 
 2. Choose the Right Location
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Checks are organized by category in ``src/nwbinspector/checks/``. Choose the appropriate file based on what you're checking:
 
@@ -42,7 +42,7 @@ Checks are organized by category in ``src/nwbinspector/checks/``. Choose the app
 - ``_image_series.py`` - ImageSeries objects
 
 3. Write Your Check
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 Here's a template for a new check:
 
@@ -61,7 +61,7 @@ Here's a template for a new check:
         return None
 
 4. Choose the Right Importance Level
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Select from three levels:
 
@@ -70,7 +70,7 @@ Select from three levels:
 - ``Importance.BEST_PRACTICE_SUGGESTION``: Minor violation or missing optional metadata
 
 5. Write Tests
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 Add tests in the corresponding test file under ``tests/unit_tests/``. Include both passing and failing cases:
 
@@ -87,7 +87,7 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
         )
 
 6. Best Practices for Check Implementation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Keep logic simple and focused
 2. Use descriptive variable names
@@ -97,7 +97,7 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
 6. Include links to relevant documentation in docstrings
 
 7. Submit Your PR
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 1. Create a new branch
 2. Add your check and tests
@@ -106,7 +106,7 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
 5. Respond to review feedback
 
 Example Check
-------------
+-------------
 
 Here's a complete example of a well-implemented check:
 
@@ -125,7 +125,7 @@ Here's a complete example of a well-implemented check:
         return None
 
 Common Pitfalls
---------------
+---------------
 
 1. **Too Broad**: Checks should validate one specific thing
 2. **Unclear Messages**: Error messages should clearly explain the issue and how to fix it
@@ -134,7 +134,7 @@ Common Pitfalls
 5. **Redundant Checks**: Ensure your check isn't duplicating existing functionality
 
 Need Help?
----------
+----------
 
 - Review existing checks for examples
 - Ask questions in your issue before starting implementation
