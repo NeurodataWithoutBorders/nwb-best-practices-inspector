@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nwbinspector"
-version = "0.6.0"
+version = "0.6.1"
 description = "Tool to inspect NWB files for best practices compliance."
 readme = "README.md"
 authors = [
