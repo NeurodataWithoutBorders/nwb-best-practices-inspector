@@ -32,7 +32,7 @@ jobs:
           pip install pytest-cov
 
       - name: Install package
-        run: pip install ".[dandi]"
+        run: pip install ".[dandi]" s3fs
 
       - name: Uninstall h5py
         run: pip uninstall -y h5py
