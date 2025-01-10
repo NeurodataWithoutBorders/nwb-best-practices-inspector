@@ -90,7 +90,48 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
             message="Expected message"
         )
 
-6. Best Practices for Check Implementation
+6. Add Check to the Public Interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Add an import for your check from the appropriate module in ``src/nwbinspector/checks/__init__.py`` 
+2. Add your check to the ```__all__``` list in ``src/nwbinspector/checks/__init__.py`` to indicate 
+   the check is part of the public interface.
+
+
+7. Add Check to the Documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Add a link to your new check function in the relevant best practice section of the ``docs/best_practices`` folder. 
+If needed, add a new section and label for your check:
+
+.. code-block:: rst
+
+    .. _best_practice_my_feature:
+    
+    My Feature
+    ~~~~~~~~~~
+    
+    Description of the best practice.
+
+    Check function: :py:meth:`~nwbinspector.checks._tables.check_my_feature`
+
+.. note::
+    If the best practice label in the ``.rst`` file ends with the same pattern as the check function name,
+    (e.g. ``.. _best_practice_my_feature:``  and ``check_my_feature``), a link to the best practice documentation
+    will be automatically added to the function API documentation. 
+
+    However, if the name of your check function does not match the name of your best practice section label 
+    (e.g. if a single best practices section has multiple check functions), you can include a link in the function
+    docstring to link to the related best practice section.
+
+    .. code-block:: python
+
+        def check_my_feature(nwbfile: NWBFile) -> Optional[InspectorMessage]:
+            """
+            One-line description of what this check validates.
+
+            Best Practice: :ref:`best_practice_my_feature_unique_label`
+            """
+
+7. Best Practices for Check Implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Keep logic simple and focused
@@ -100,7 +141,7 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
 5. Make error messages clear and actionable
 6. Include links to relevant documentation in docstrings
 
-7. Submit Your PR
+8. Submit Your PR
 ^^^^^^^^^^^^^^^^^
 
 1. Create a new branch
