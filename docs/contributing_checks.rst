@@ -63,7 +63,7 @@ Here's a template for a new check:
         return None
 .. note::
    The function name for the check should always start with ``check_``
-   
+
 4. Choose the Right Importance Level
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
