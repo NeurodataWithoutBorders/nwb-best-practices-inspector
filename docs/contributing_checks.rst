@@ -40,6 +40,8 @@ Checks are organized by category in ``src/nwbinspector/checks/``. Choose the app
 8. ``_ophys.py`` - Optical physiology
 9. ``_ogen.py`` - Optogenetics
 10. ``_image_series.py`` - :py:class:`~pynwb.image.ImageSeries` objects
+11. ``_images.py`` - :py:class:`~pynwb.base.Images` objects
+12. ``_general.py`` - attributes of general neurodata types
 
 3. Write Your Check
 ^^^^^^^^^^^^^^^^^^^
