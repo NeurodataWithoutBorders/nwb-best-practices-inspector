@@ -92,23 +92,23 @@ Add tests in the corresponding test file under ``tests/unit_tests/``. Include bo
 
 6. Add Check to the Public Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1. Add an import for your check from the appropriate module in ``src/nwbinspector/checks/__init__.py`` 
-2. Add your check to the ```__all__``` list in ``src/nwbinspector/checks/__init__.py`` to indicate 
+1. Add an import for your check from the appropriate module in ``src/nwbinspector/checks/__init__.py``
+2. Add your check to the ```__all__``` list in ``src/nwbinspector/checks/__init__.py`` to indicate
    the check is part of the public interface.
 
 
 7. Add Check to the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Add a link to your new check function in the relevant best practice section of the ``docs/best_practices`` folder. 
+Add a link to your new check function in the relevant best practice section of the ``docs/best_practices`` folder.
 If needed, add a new section and label for your check:
 
 .. code-block:: rst
 
     .. _best_practice_my_feature:
-    
+
     My Feature
     ~~~~~~~~~~
-    
+
     Description of the best practice.
 
     Check function: :py:meth:`~nwbinspector.checks._tables.check_my_feature`
@@ -116,9 +116,9 @@ If needed, add a new section and label for your check:
 .. note::
     If the best practice label in the ``.rst`` file ends with the same pattern as the check function name,
     (e.g. ``.. _best_practice_my_feature:``  and ``check_my_feature``), a link to the best practice documentation
-    will be automatically added to the function API documentation. 
+    will be automatically added to the function API documentation.
 
-    However, if the name of your check function does not match the name of your best practice section label 
+    However, if the name of your check function does not match the name of your best practice section label
     (e.g. if a single best practices section has multiple check functions), you can include a link in the function
     docstring to link to the related best practice section.
 
