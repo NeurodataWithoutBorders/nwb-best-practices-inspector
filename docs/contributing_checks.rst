@@ -22,7 +22,7 @@ Before writing code:
 
 1. Open a :nwbinspector-issues:`'New Check' issue <>`
 2. Describe what the check will validate
-3. Link to relevant :doc:`best practices documentation <best_practices/best_practices_index>`
+3. Link to relevant :doc:`best practices documentation <best_practices/best_practices_index>` if applicable. If proposing a new best practice, please describe in detail.
 4. Wait for approval before proceeding
 
 2. Choose the Right Location
