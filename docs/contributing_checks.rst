@@ -61,7 +61,9 @@ Here's a template for a new check:
                 message="Clear description of the issue and how to fix it."
             )
         return None
-
+.. note::
+   The function name for the check should always start with ``check_``
+   
 4. Choose the Right Importance Level
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
