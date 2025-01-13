@@ -70,7 +70,7 @@ Here's a template for a new check:
 Select from three levels (see :doc:`checks_by_importance` for examples):
 
 1. ``Importance.CRITICAL``: High likelihood of incorrect data that can't be caught by PyNWB validation
-2. ``Importance.BEST_PRACTICE_VIOLATION``: Major violation of :nwb-overview:`Best Practices <best_practices/best_practices_index.html>`
+2. ``Importance.BEST_PRACTICE_VIOLATION``: Major violation of :doc:`Best Practices <best_practices/best_practices_index>`
 3. ``Importance.BEST_PRACTICE_SUGGESTION``: Minor violation or missing optional metadata
 
 5. Write Tests
