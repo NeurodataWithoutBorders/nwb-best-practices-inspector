@@ -35,7 +35,6 @@ dependencies = [
     "pynwb>=2.8,<3",   # NWB Inspector should always be used with most recent minor versions of PyNWB
     "hdmf-zarr",
     "fsspec",
-    "s3fs",
     "requests",
     "aiohttp",
     "PyYAML",
@@ -63,7 +62,7 @@ nwbinspector = "nwbinspector._nwbinspector_cli:_nwbinspector_cli"
 
 [tool.black]
 line-length = 120
-target-version = ['py37']
+target-version = ['py39']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
