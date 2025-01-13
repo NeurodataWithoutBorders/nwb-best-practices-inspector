@@ -91,6 +91,7 @@ class TestNWBContainers(TestCase):
             nwb_container = self.add_dataset_to_nwb_container(file=file, gb_size=0.001)
             self.assertIsNone(obj=check_large_dataset_compression(nwb_container=nwb_container))
 
+
 def test_no_error_raised_when_dataset_is_compressed():
     """Test that no InspectorMessage is returned for a compressed dataset."""
     test_folder = Path(mkdtemp())
@@ -98,11 +99,7 @@ def test_no_error_raised_when_dataset_is_compressed():
 
     with h5py.File(name=str(file_path), mode="w") as file:
         data = np.zeros(shape=(100, 100, 100))  # example small data shape
-        dataset = file.create_dataset(
-            name="test_dataset",
-            data=data,
-            compression="gzip"  # Enable compression
-        )
+        dataset = file.create_dataset(name="test_dataset", data=data, compression="gzip")  # Enable compression
 
         nwb_container = NWBContainer(name="test_container")
         nwb_container.fields.update(dataset=dataset)
@@ -114,6 +111,8 @@ def test_no_error_raised_when_dataset_is_compressed():
 
     # Cleanup the temporary directory after the test
     rmtree(test_folder)
+
+
 def test_hit_check_empty_string_for_optional_attribute():
     nwbfile = NWBFile(session_description="aa", identifier="aa", session_start_time=datetime.now(), pharmacology="")
 
