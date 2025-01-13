@@ -36,3 +36,4 @@ dist/
 
 # Doc build
 /docs/_build/*
+_build/
