@@ -32,8 +32,8 @@ def check_large_dataset_compression(
         elif isinstance(field, zarr.Array):
             compression_indicator = field.compressor
         
-        data_size_bytes= field.size * field.dtype.itemsize
-        if compression_indicator is None and data_size_bytes > gb_lower_bound * 1e9:
+        field_size_bytes= field.size * field.dtype.itemsize
+        if compression_indicator is None and field_size_bytes > gb_lower_bound * 1e9:
             return InspectorMessage(
                 severity=Severity.HIGH,
                 message=f"{os.path.split(field.name)[1]} is a large uncompressed dataset! Please enable compression.",
