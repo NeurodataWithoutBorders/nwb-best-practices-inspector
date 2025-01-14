@@ -3,6 +3,9 @@
 ### Deprecation
 * Remove s3fs dependency, which was causing dependency management issues [#549](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/549)
 
+### Fixes
+* Fix wrongly triggered compression check [#552](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/552)
+
 ## Improvements
 * Added a section for describing the issues with negative timestamps in `TimeSeries` [#545](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/545)
 
