@@ -124,9 +124,12 @@ def test_check_timestamps_match_first_dimension_special_skip(tmp_path):
     image_height = 15
     num_channels = 3
     dtype = "uint8"
-    image_series = pynwb.image.ImageSeries(
+
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for data.shape[0] == len(timestamps)
+    image_series = pynwb.image.ImageSeries.__new__(pynwb.image.ImageSeries, in_construct_mode=True)
+    image_series.__init__(
         name="ImageSeries",
-        unit="n.a.",
+        unit="N/A",
         data=np.empty(shape=(num_images, image_width, image_height, num_channels), dtype=dtype),
         timestamps=[],
     )
@@ -134,7 +137,7 @@ def test_check_timestamps_match_first_dimension_special_skip(tmp_path):
     nwbfile.add_acquisition(
         pynwb.image.IndexSeries(
             name="IndexSeries",
-            unit="n.a.",
+            unit="N/A",
             data=[0, 1],
             indexed_timeseries=image_series,
             timestamps=[0.5, 0.6],
@@ -152,14 +155,15 @@ def test_check_timestamps_match_first_dimension_special_skip(tmp_path):
 
 
 def test_check_timestamps_match_first_dimension_bad():
-    assert check_timestamps_match_first_dimension(
-        time_series=pynwb.TimeSeries(
-            name="test_time_series",
-            unit="test_units",
-            data=np.empty(shape=4),
-            timestamps=[1.0, 2.0, 3.0],
-        )
-    ) == InspectorMessage(
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for data.shape[0] == len(timestamps)
+    time_series = pynwb.TimeSeries.__new__(pynwb.TimeSeries, in_construct_mode=True)
+    time_series.__init__(
+        name="test_time_series",
+        unit="test_units",
+        data=np.empty(shape=4),
+        timestamps=[1.0, 2.0, 3.0],
+    )
+    assert check_timestamps_match_first_dimension(time_series=time_series) == InspectorMessage(
         message="The length of the first dimension of data (4) does not match the length of timestamps (3).",
         importance=Importance.CRITICAL,
         check_function_name="check_timestamps_match_first_dimension",
@@ -170,9 +174,15 @@ def test_check_timestamps_match_first_dimension_bad():
 
 
 def test_check_timestamps_empty_data():
-    assert check_timestamps_match_first_dimension(
-        time_series=pynwb.TimeSeries(name="test_time_series", unit="test_units", data=[], timestamps=[1.0, 2.0, 3.0])
-    ) == InspectorMessage(
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for data.shape[0] == len(timestamps)
+    time_series = pynwb.TimeSeries.__new__(pynwb.TimeSeries, in_construct_mode=True)
+    time_series.__init__(
+        name="test_time_series",
+        unit="test_units",
+        data=[],
+        timestamps=[1.0, 2.0, 3.0],
+    )
+    assert check_timestamps_match_first_dimension(time_series=time_series) == InspectorMessage(
         message="The length of the first dimension of data (0) does not match the length of timestamps (3).",
         importance=Importance.CRITICAL,
         check_function_name="check_timestamps_match_first_dimension",
@@ -183,9 +193,15 @@ def test_check_timestamps_empty_data():
 
 
 def test_check_timestamps_empty_timestamps():
-    assert check_timestamps_match_first_dimension(
-        time_series=pynwb.TimeSeries(name="test_time_series", unit="test_units", data=np.empty(shape=4), timestamps=[])
-    ) == InspectorMessage(
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for data.shape[0] == len(timestamps)
+    time_series = pynwb.TimeSeries.__new__(pynwb.TimeSeries, in_construct_mode=True)
+    time_series.__init__(
+        name="test_time_series",
+        unit="test_units",
+        data=np.empty(shape=4),
+        timestamps=[],
+    )
+    assert check_timestamps_match_first_dimension(time_series=time_series) == InspectorMessage(
         message="The length of the first dimension of data (4) does not match the length of timestamps (0).",
         importance=Importance.CRITICAL,
         check_function_name="check_timestamps_match_first_dimension",

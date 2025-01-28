@@ -8,6 +8,8 @@
 
 ## Improvements
 * Added a section for describing the issues with negative timestamps in `TimeSeries` [#545](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/545)
+* Use alternate way of generating `TimeSeries` objects to avoid new pynwb error when the shape of the first dimension of
+  data does not match the length of timestamps [#556](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/556)
 
 # v0.6.1
 
