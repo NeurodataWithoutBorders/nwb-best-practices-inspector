@@ -95,7 +95,9 @@ def add_flipped_data_orientation_to_processing(nwbfile: NWBFile):
 def add_non_matching_timestamps_dimension(nwbfile: NWBFile):
     timestamps = [1.0, 2.1, 3.0]
     timestamps_length = len(timestamps)
-    time_series = TimeSeries(
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for data.shape[0] == len(timestamps)
+    time_series = TimeSeries.__new__(TimeSeries, in_construct_mode=True)
+    time_series.__init__(
         name="test_time_series_3",
         data=np.zeros(shape=(timestamps_length + 1, timestamps_length)),
         timestamps=timestamps,
