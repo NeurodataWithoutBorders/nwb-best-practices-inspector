@@ -158,7 +158,8 @@ class TestInspectorOnBackend(TestCase):
                 test_file_lines[line_number + 2] = "NWBInspector version: 0.3.6"
             if ".nwb" in test_line:
                 # Transform temporary testing path and formatted to hardcoded fake path
-                str_loc = test_line.find(".nwb")
+                suffix = IO_CLASSES_TO_BACKEND[self.BackendIOClass]
+                str_loc = test_line.find(f".{suffix}.nwb")
                 correction_str = test_line.replace(test_line[5 : str_loc - 8], "./")  # noqa: E203 (black)
                 test_file_lines[line_number] = correction_str
         self.assertEqual(first=test_file_lines[skip_first_n_lines : -(1 + skip_last_n_lines)], second=true_file_lines)
@@ -193,7 +194,7 @@ class TestInspectorAPIAndCLIHDF5(TestInspectorOnBackend):
         add_non_matching_timestamps_dimension(nwbfiles[3])
 
         suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
-        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)]
+        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.{suffix}.nwb") for j in range(num_nwbfiles)]
         cls.nwbfile_paths[3] = str(cls.tempdir / "._testing3.nwb")
         for nwbfile_path, nwbfile in zip(cls.nwbfile_paths, nwbfiles):
             with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
@@ -686,7 +687,7 @@ class TestDANDIConfigHDF5(TestInspectorOnBackend):
         add_flipped_data_orientation_to_acquisition(nwbfiles[1])
 
         suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
-        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)]
+        cls.nwbfile_paths = [str(cls.tempdir / f"testing{j}.{suffix}.nwb") for j in range(num_nwbfiles)]
         for nwbfile_path, nwbfile in zip(cls.nwbfile_paths, nwbfiles):
             with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
                 io.write(nwbfile)
@@ -800,7 +801,7 @@ class TestCheckUniqueIdentifiersPassHDF5(TestCase):
 
         suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
         cls.unique_id_nwbfile_paths = [
-            str(cls.tempdir / f"unique_id_testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)
+            str(cls.tempdir / f"unique_id_testing{j}.{suffix}.nwb") for j in range(num_nwbfiles)
         ]
         for nwbfile_path, nwbfile in zip(cls.unique_id_nwbfile_paths, unique_id_nwbfiles):
             with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:
@@ -840,7 +841,7 @@ class TestCheckUniqueIdentifiersFailHDF5(TestCase):
 
         suffix = IO_CLASSES_TO_BACKEND[cls.BackendIOClass]
         cls.non_unique_id_nwbfile_paths = [
-            str(cls.tempdir / f"non_unique_id_testing{j}.nwb.{suffix}") for j in range(num_nwbfiles)
+            str(cls.tempdir / f"non_unique_id_testing{j}.{suffix}.nwb") for j in range(num_nwbfiles)
         ]
         for nwbfile_path, nwbfile in zip(cls.non_unique_id_nwbfile_paths, non_unique_id_nwbfiles):
             with cls.BackendIOClass(path=nwbfile_path, mode="w") as io:

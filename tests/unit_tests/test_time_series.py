@@ -133,16 +133,18 @@ def test_check_timestamps_match_first_dimension_special_skip(tmp_path):
         data=np.empty(shape=(num_images, image_width, image_height, num_channels), dtype=dtype),
         timestamps=[],
     )
-    nwbfile.add_acquisition(image_series)
-    nwbfile.add_acquisition(
-        pynwb.image.IndexSeries(
-            name="IndexSeries",
-            unit="N/A",
-            data=[0, 1],
-            indexed_timeseries=image_series,
-            timestamps=[0.5, 0.6],
-        )
+
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for deprecated indexed_timeseries
+    index_series = pynwb.image.IndexSeries.__new__(pynwb.image.IndexSeries, in_construct_mode=True)
+    index_series.__init__(
+        name="IndexSeries",
+        unit="N/A",
+        data=[0, 1],
+        indexed_timeseries=image_series,
+        timestamps=[0.5, 0.6],
     )
+    nwbfile.add_acquisition(image_series)
+    nwbfile.add_acquisition(index_series)
 
     with pynwb.NWBHDF5IO(path=nwbfile_path, mode="w") as io:
         io.write(nwbfile)
