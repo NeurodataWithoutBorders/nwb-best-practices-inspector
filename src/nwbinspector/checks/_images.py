@@ -39,6 +39,6 @@ def check_index_series_points_to_image(index_series: IndexSeries) -> Optional[In
         return InspectorMessage(
             message="Pointing an IndexSeries to a TimeSeries will be deprecated. Please point to an Images "
             "container instead."
-        )
+        )  # TODO - update when pynwb 3.0 is the minimum version
 
     return None

@@ -548,7 +548,7 @@ def test_pass_check_subject_id_exist():
 
 
 def test_check_processing_module_name():
-    processing_module = ProcessingModule("test", "desc")
+    processing_module = ProcessingModule(name="test", description="desc")
     assert check_processing_module_name(processing_module) == InspectorMessage(
         message=(
             f"Processing module is named test. It is recommended to use the schema "
@@ -563,5 +563,5 @@ def test_check_processing_module_name():
 
 
 def test_pass_check_processing_module_name():
-    processing_module = ProcessingModule("ecephys", "desc")
+    processing_module = ProcessingModule(name="ecephys", description="desc")
     assert check_processing_module_name(processing_module) is None

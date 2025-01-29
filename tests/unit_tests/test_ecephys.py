@@ -133,10 +133,10 @@ class TestCheckElectricalSeries(TestCase):
         assert check_electrical_series_reference_electrodes_table(electrical_series) is None
 
     def test_trigger_check_electrical_series_reference_electrodes_table(self):
-        dyn_tab = DynamicTable("name", "desc")
-        dyn_tab.add_column("name", "desc")
+        dyn_tab = DynamicTable(name="name", description="desc")
+        dyn_tab.add_column("group_name", "desc")
         for i in range(5):
-            dyn_tab.add_row(name=1)
+            dyn_tab.add_row(group_name=1)
         dynamic_table_region = DynamicTableRegion(
             name="electrodes", description="I am wrong", data=[0, 1, 2, 3, 4], table=dyn_tab
         )

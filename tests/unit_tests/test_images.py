@@ -69,7 +69,7 @@ def test_pass_check_index_series_points_to_image():
         name="images",
         images=[gs_img],
         description="An example collection.",
-        order_of_images=ImageReferences("order_of_images", [gs_img]),
+        order_of_images=ImageReferences(name="order_of_images", data=[gs_img]),
     )
 
     idx_series = IndexSeries(
@@ -92,7 +92,9 @@ def test_fail_check_index_series_points_to_image():
         unit="n.a.",
     )
 
-    idx_series = IndexSeries(
+    # Use __new__ and in_construct_mode=True to bypass the check in pynwb for deprecated indexed_timeseries
+    idx_series = IndexSeries.__new__(IndexSeries, in_construct_mode=True)
+    idx_series.__init__(
         name="stimuli",
         data=[0, 1, 0, 1],
         indexed_timeseries=time_series,
@@ -105,7 +107,7 @@ def test_fail_check_index_series_points_to_image():
         importance=Importance.BEST_PRACTICE_VIOLATION,
         object_type="IndexSeries",
         message="Pointing an IndexSeries to a TimeSeries will be deprecated. Please point to an Images container "
-        "instead.",
+        "instead.",  # TODO - update message when PyNWB 3.0 is released
         location="/",
         check_function_name="check_index_series_points_to_image",
     )
