@@ -5,6 +5,7 @@
 
 ### Fixes
 * Fix wrongly triggered compression check [#552](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/552)
+* Fixed URL inspection using the CLI [#559](https://github.com/NeurodataWithoutBorders/nwbinspector/issues/559)
 
 ## Improvements
 * Added a section for describing the issues with negative timestamps in `TimeSeries` [#545](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/545)
