@@ -1,5 +1,7 @@
 """Test the API functions related to streaming."""
 
+import os
+
 import pytest
 
 from nwbinspector import (
@@ -104,3 +106,17 @@ def test_inspect_url():
     )
 
     assert test_message == expected_message
+
+
+@pytest.mark.skipif(not STREAMING_TESTS_ENABLED, reason=DISABLED_STREAMING_TESTS_REASON or "")
+def test_inspect_url_cli(tmp_path):
+    """Test that the CLI correctly handles inspecting a URL."""
+    url = "https://dandiarchive.s3.amazonaws.com/blobs/11e/c89/11ec8933-1456-4942-922b-94e5878bb991"
+    console_output_file = tmp_path / "url_console_output.txt"
+
+    os.system(f"nwbinspector {url} " "--skip-validate " f"> {console_output_file}")
+
+    # Read and check the contents of the console output file
+    with open(console_output_file, "r") as file:
+        output = file.read()
+        assert "Subject species is missing." in output
