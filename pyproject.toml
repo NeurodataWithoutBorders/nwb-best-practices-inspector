@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nwbinspector"
-version = "0.6.1"
+version = "0.6.2"
 description = "Tool to inspect NWB files for best practices compliance."
 readme = "README.md"
 authors = [
@@ -14,6 +14,7 @@ authors = [
     {name = "Heberto Mayorquin"},
     {name = "Paul Adkisson"},
     {name = "Luiz Tauffer"},
+    {name = "Ryan Ly"},
     {name = "Ben Dichter",  email = "ben.dichter@catalystneuro.com"}
 ]
 urls = { "Homepage" = "https://github.com/NeurodataWithoutBorders/nwbinspector" }

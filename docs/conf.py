@@ -11,8 +11,8 @@ from conf_extlinks import extlinks, intersphinx_mapping
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 project = "NWBInspector"
-copyright = "2022-2024, CatalystNeuro"
-author = "Cody Baker, Ryan Ly, and Ben Dichter"
+copyright = "2022-2025, CatalystNeuro"
+author = "Cody Baker, Steph Prince, Szonja Weigl, Heberto Mayorquin, Paul Adkisson, Luiz Tauffer, Ryan Ly, and Ben Dichter"
 
 extensions = [
     "sphinx.ext.doctest",
