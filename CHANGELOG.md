@@ -1,4 +1,4 @@
-# Upcoming
+# v0.6.2
 
 ### Deprecation
 * Remove s3fs dependency, which was causing dependency management issues [#549](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/549)
