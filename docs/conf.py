@@ -12,7 +12,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 project = "NWBInspector"
 copyright = "2022-2025, CatalystNeuro"
-author = "Cody Baker, Steph Prince, Szonja Weigl, Heberto Mayorquin, Paul Adkisson, Luiz Tauffer, Ryan Ly, and Ben Dichter"
+author = (
+    "Cody Baker, Steph Prince, Szonja Weigl, Heberto Mayorquin, Paul Adkisson, Luiz Tauffer, Ryan Ly, and Ben Dichter"
+)
 
 extensions = [
     "sphinx.ext.doctest",
