@@ -160,7 +160,7 @@ def _nwbinspector_cli(
             show_progress_bar=show_progress_bar,
         )
     # Scan a single NWB file in a Dandiset
-    elif stream and ":" in path:
+    elif stream and ":" in path and not path_is_url:
         dandiset_id, dandi_file_path = path.split(":")
         dandiset_version = version_id
 
