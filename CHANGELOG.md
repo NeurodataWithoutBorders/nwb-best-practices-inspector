@@ -15,6 +15,7 @@
 
 ### Improvements
 * Added support for Numpy 2 and h5py 3.12, and pinned PyNWB to <3.0 temporarily. [#536](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/536)
+* Added best practice around not using colons in object names. [#532](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/532)
 
 ### Fixes
 * Fixed issue where the description check failed if the description was a list. [#535](https://github.com/NeurodataWithoutBorders/nwbinspector/pull/535)
